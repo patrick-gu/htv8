@@ -348,17 +348,17 @@ function Ingredients({
       console.log(error);
     });
     setScreenId(1);
-    // fetch("http://127.0.0.1:8080/recipe/suggest", {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify({ ingredients: ingredientsList })
-    // }).then(async (response) => {
-    //     const { content } = await response.json();
-    //     console.log(content);
-    //     setRecipe(content);
-    // })
+    fetch("http://127.0.0.1:8080/recipe/suggest", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ingredients: ingredientsList })
+    }).then(async (response) => {
+        const { content } = await response.json();
+        console.log(content);
+        setRecipe(content);
+    })
   };
 
   //append ingredient to list
