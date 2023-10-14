@@ -469,14 +469,14 @@ function Ingredients({
           </div>
         </div>
         <div className="flex flex-col items-center">
-          <h2 className="text-2xl font-bold text-center">Ingredients</h2>
+          <h2 className="text-2xl font-bold text-center">Grocery Items</h2>
           <div className="mb-4">
             <div className="flex items-center">
               <input
                 className="shadow appearance-none border rounded w-fit py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
                 id="ingredient"
                 type="text"
-                placeholder="Enter your ingredient!"
+                placeholder="Enter your items!"
                 value={ingredient}
                 onChange={handleIngredientChange}
                 onKeyUp={handleEnter}
@@ -498,11 +498,19 @@ function Ingredients({
                     >
                       <div className="flex-grow space-x-3">
                         <span>{item}</span>
-                        <span>Quantity: {quantities[index]}</span>
+                        <span className="font-bold">Quantity: {quantities[index]}</span>
                       </div>
-                      <div className="flex items-center">
-                        <img src={chevronUp} alt="Up" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityUp(index)} />
-                        <img src={chevronDown} alt="Down" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityDown(index)} />
+                      <div className="flex items-center space-x-3">
+                      <div className="caret" onClick={()=>{handleQuantityUp(index)}}>
+                        <svg class="w-6 h-6 text-black dark:text-white hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 8">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7 7.674 1.3a.91.91 0 0 0-1.348 0L1 7"/>
+                        </svg>
+                      </div>
+                      <div className="caret" onClick={()=>{handleQuantityDown(index)}}>
+                        <svg class="w-6 h-6 text-black dark:text-white hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 8" >
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 5.326 5.7a.909.909 0 0 0 1.348 0L13 1"/>
+                        </svg>
+                      </div>
                       </div>
                     </div>
                   </li>
