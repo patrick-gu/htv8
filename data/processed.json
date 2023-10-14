@@ -1,0 +1,34 @@
+{
+  "stores": ["walmart", "store2"],
+  "products": {
+    "tomato": [
+      {
+        "store": "walmart",
+        "price": 147,
+        "type": "bulk",
+        "qty": {
+          "amount": 1,
+          "unit": "lb"
+        }
+      },
+      {
+        "store": "store2",
+        "price": 150,
+        "type": "bulk",
+        "qty": {
+          "amount": 1,
+          "unit": "lb"
+        }
+      },
+      {
+        "store": "store3",
+        "price": 130,
+        "type": "unit",
+        "qty": {
+          "amount": 1,
+          "unit": "lb"
+        }
+      }
+    ]
+  }
+}
