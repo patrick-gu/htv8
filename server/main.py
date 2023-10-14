@@ -186,6 +186,7 @@ async def flipp(query: str):
 
 @app.post("/filter/")
 async def flipp(sieve: Sieve):
+    print("filter")
     f = open('data.json')
     data = json.load(f)
     categorizeByItem = {}
@@ -199,7 +200,7 @@ async def flipp(sieve: Sieve):
                         categorizeByItem[shoppingListItem] = categorizeByItem[shoppingListItem]+[item]
     totalcost = 0
     bestShoppingList = []
-    counter=0
+    counter = 0
     for key in categorizeByItem.keys():
         itemCost = 1e9
         item = None
@@ -212,7 +213,7 @@ async def flipp(sieve: Sieve):
                 0 == 0
         if (item != None):
             newItem = FinalItem(
-                item['name'], item['store'], item['price'], item['img'], None,sieve.quantities[counter])
+                item['name'], item['store'], item['price'], item['img'], None, sieve.quantities[counter])
             bestShoppingList.append(newItem)
             totalcost += (float(item['price'])*sieve.quantities[counter])
         else:
@@ -313,6 +314,9 @@ async def flipp(query: str):
     return searchItem(query, "M1B5J5", 3111)
 
 
+client = httpx.AsyncClient()
+
+
 @app.post("/paybilt")
 async def payment_paybilt(request: Request):
     """
@@ -344,14 +348,14 @@ async def payment_paybilt(request: Request):
         "Accept": "application/json",
         "Authorization": f"Bearer {PAYBILT_TOKEN}"
     }
-    response = httpx.request(
+    response = await client.request(
         "POST", url, json=paybilt_body, headers=headers)
     return response.json()
 
 
 @app.get('/paybilt/status/{txid}')
 async def paybilt_status_proxy(txid: str):
-    response = httpx.request("GET", f"https://sandbox.pp.paybilt.com/api/v2/status/{txid}", headers={
+    response = await client.request("GET", f"https://sandbox.pp.paybilt.com/api/v2/status/{txid}", headers={
         "Authorization": f"Bearer {PAYBILT_TOKEN}"})
     return response.json()
 
@@ -375,7 +379,7 @@ async def recipe_suggestion(request: Request):
     }
 
     OPENAI_TOKEN = os.environ["OPENAI_TOKEN"]
-    response = httpx.request(
+    response = await client.request(
         "POST", "https://api.openai.com/v1/chat/completions", json=payload, headers={"Authorization": f"Bearer {OPENAI_TOKEN}"}, timeout=httpx.Timeout(60.0))
     json = response.json()
     print(json)
