@@ -3,6 +3,221 @@ import axios from 'axios';
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
 import SearchResultItem from "./entry";
+
+
+function InitMapRoute() {
+  return( <div style={ {height: 600 + "px"}} id="map"></div> )
+}
+
+function MapRoute() {
+  let map;
+
+  async function initMap() {
+
+
+    let origin = { lat: 43.7867303, lng: -79.1920265 };
+
+    // Initializing the map
+    const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement, PinElement} = await google.maps.importLibrary("marker")
+
+    map = new Map(document.getElementById("map"), {
+    center: origin,
+    zoom: 15,
+    mapId: 'd5dc8cb3b04938bd',
+    });
+
+    const infoWindow = new InfoWindow();
+    
+
+
+    const home = new AdvancedMarkerElement({
+        map,
+        position: origin,
+        title: "home",
+        content: new PinElement({ glyph: String(0) }).element
+    });
+    home.addListener("click", ({ domEvent, latLng }) => {
+        const { target } = domEvent;
+  
+        infoWindow.close();
+        infoWindow.setContent(home.title);
+        infoWindow.open(home.map, home);
+      });
+
+
+    const placesService = new google.maps.places.PlacesService(map);
+
+
+    let input = ["Walmart Supercentre", "Metro", "Food Basics", "NoFrills", "Costco", "FreshCo", "Superstore"];
+
+    
+    async function getLocations(stores) {
+        
+        let storetype;
+        function addPlaces(results, store) {
+            for (const location of results) {
+                const marker = new AdvancedMarkerElement({
+                    map,
+                    position: location.geometry.location,
+                    title: location.name,
+                    content: new PinElement({ glyph: String(store[0]) }).element
+
+                });
+
+                marker.addListener("click", ({ domEvent, latLng }) => {
+                    const { target } = domEvent;
+              
+                    infoWindow.close();
+                    infoWindow.setContent(marker.title);
+                    infoWindow.open(marker.map, marker);
+                  });    
+            }
+        }
+
+        // T&T, Sobeys, Superstore, loblaws has 2
+
+        for (let store of stores) {
+            console.log(store);
+            storetype = "supermarket"
+            if (store === "NoFrills" || store === "FreshCo" || store === "Superstore") storetype = "grocery_or_supermarket";
+            if (store === "Costco") storetype = "department_store";
+
+            const {results, status } = await new Promise((res, rej) => {
+                placesService.nearbySearch(
+                    { location: origin, radius: 10000, name: store, type: storetype},
+                    (results, status) => {
+
+                        if (store === "Costco") {
+                            results = results.filter((v) => (v.name !== "Costco Business Centre"))
+                        }
+
+                        if (store === "Superstore") {
+                            results = results.filter((v) => (v.name.includes("Real Canadian")))
+                        }
+
+                        console.log(results)
+
+                        
+                        res({ results, status});
+                    })
+            })
+            if (status !== "OK" || !results) return;
+            addPlaces(results, store);
+            locations.push(results);
+
+            
+        }
+        
+        getMinDist(origin, locations, [])
+    }
+
+
+
+
+
+    
+    let locations = [];
+
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
+
+
+
+
+    // Distance Function
+    const distanceService = new google.maps.DistanceMatrixService();
+
+
+
+    async function getMinDist(start, places, waypoints) {
+        let minRoute = [9999999999999999999, ""];
+        let request;
+        let result;
+
+
+        for (let i = 0; i < places.length; i++) {
+            
+            for (const store of places[i]) {
+
+                request = {
+                    origins: [start],
+                    destinations: [store.geometry.location],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC,
+                    avoidHighways: false,
+                    avoidTolls: false,
+                };
+                
+                result = await new Promise((res,rej) => {
+                    distanceService.getDistanceMatrix(request).then((response) => {
+                        
+                        let data = response.rows[0].elements[0];
+                        let time = Number(data.duration.text.split(" ")[0])
+
+                        if (time < minRoute[0]) {
+                            minRoute = [time, store.geometry.location, store.name, i];
+                        }
+                        res(minRoute);
+                    });
+                })
+            }
+        }
+        console.log(result[3], places, places[result[3]])
+
+        waypoints.push(result[1]);
+        places.splice(result[3], 1);
+
+
+        if (places.length === 0) {
+            calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints);
+        } 
+        else {
+            // console.log(places)
+            getMinDist(result[1], places, waypoints);
+        }
+
+    }
+
+
+
+
+    function calculateAndDisplayRoute(directionsService, directionsRenderer, pts) {
+
+        const waypts = [];
+        for (const pt of pts) {
+            waypts.push({location: pt, stopover: true})
+        }
+        
+
+
+
+        directionsService
+        .route({
+            origin: new google.maps.LatLng(origin.lat, origin.lng) ,
+            destination: new google.maps.LatLng(origin.lat, origin.lng),
+            waypoints: waypts,
+            optimizeWaypoints: true,
+            travelMode: google.maps.TravelMode.DRIVING,
+        })
+        .then((response) => {
+            directionsRenderer.setDirections(response);
+            console.log(response)
+        })
+
+    }
+
+    
+    getLocations(input);
+
+    
+      
+}
+  initMap();  
+}
+
+
 function StoreSuggestions({ selectedStores }) {
   // For now, let's assume it's a simple array of suggestions
   const suggestions = [
@@ -127,6 +342,7 @@ function Ingredients({
     .then(function (response) {
       setCurrentList(response.data[0]);
       console.log(response.data[0])
+      MapRoute();
     })
     .catch(function (error) {
       console.log(error);
@@ -340,6 +556,7 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
               ))}
             </div>
             <StoreSuggestions selectedStores={storesSelected} />
+            <InitMapRoute />
             <div>
               <div id="resultsList">
               {
