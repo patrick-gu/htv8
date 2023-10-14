@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from 'axios';
 import bin from "./assets/bin.png";
 
 function StoreSuggestions({ selectedStores }) {
@@ -30,34 +31,20 @@ function StoreSuggestions({ selectedStores }) {
 function App() {
   const [ingredient, setIngredient] = useState(""); // State to capture the entered ingredient
   const [ingredientsList, setIngredientsList] = useState([]); // State to store the list of ingredients
-  const [storesSelected, setStoresSelected] = useState([]);
+  const [storesSelected, setStoresSelected] = useState(["T&T Supermarket","No Frills","Walmart","FreshCo","Real Canadian Superstore","Sobeys","Metro","Food Basics","Loblaws","Costco"]);
+  const [currentCost, setCurrentCost] = useState(0);
+  const [currentItems,setCurrentItems] = useState([]);
   const stores = [
     "Walmart",
     "Metro",
     "Food Basics",
-    "Your Independent Grocer",
     "No Frills",
     "Sobeys",
-    "Fortino's",
-    "Foodland",
     "Real Canadian Superstore",
-    "Longos",
     "Loblaws",
     "T&T Supermarket",
-    "Farm Boy",
-    "Canadian Tire Gas+",
-    "Wild Fork",
     "Costco",
-    "FreshCo",
-    "Wholesale Club and Club EntrepÃ´t",
-    "Marche Adonis",
-    "Healthy Planet",
-    "M&M Food Market",
-    "Independent City Market",
-    "Valu-Mart",
-    "Giant Tiger",
-    "Coppa's Fresh Market",
-    "London Drugs",
+    "FreshCo"
   ]; //possible stores
 
   const [screenId, setScreenId] = useState(0);
@@ -80,12 +67,14 @@ function App() {
           ingredientsList={ingredientsList}
           setIngredientsList={setIngredientsList}
           setScreenId={setScreenId}
+          storesSelected={storesSelected}
         />
         <Another
           stores={stores}
           storesSelected={storesSelected}
           setStoresSelected={setStoresSelected}
           setScreenId={setScreenId}
+          ingredientsList={ingredientsList}
         />
         <SuggestRecipes setScreenId={setScreenId} />
         <GetYourStuff setScreenId={setScreenId} />
@@ -100,10 +89,25 @@ function Ingredients({
   ingredientsList,
   setIngredientsList,
   setScreenId,
+  storesSelected,
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
     setIngredient(e.target.value); // Update the ingredient state when the input changes
+  };
+
+  const firstPageNext = async() =>{
+    await axios.post('http://127.0.0.1:8080/filter', {
+      storesList: storesSelected,
+      shoppingList: ingredientsList
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    setScreenId(1);
   };
 
   //append ingredient to list
@@ -132,7 +136,7 @@ function Ingredients({
     <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-end">
         <button
-          onClick={() => setScreenId(1)}
+          onClick={firstPageNext}
           className="bg-blue-500 rounded-full py-2 px-4 text-white"
         >
           Next
@@ -206,18 +210,42 @@ function Ingredients({
   );
 }
 
-function Another({ stores, storesSelected, setStoresSelected, setScreenId }) {
-  const handleStoreSelect = (store) => {
+function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingredientsList }) {
+  const handleStoreSelect = async(store) => {
     if (storesSelected.includes(store)) {
       // Store is already selected, remove it and change the background to white
+      const newStoresSelected=storesSelected.filter((selectedStore) => selectedStore !== store);
       setStoresSelected(
-        storesSelected.filter((selectedStore) => selectedStore !== store)
+        newStoresSelected
       );
-    } else {
+
+      await axios.post('http://127.0.0.1:8080/filter', {
+        storesList: newStoresSelected,
+        shoppingList: ingredientsList,
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+    else {
       // Store is not selected, add it and change the background to green
       setStoresSelected([...storesSelected, store]);
+      await axios.post('http://127.0.0.1:8080/filter', {
+        storesList: [...storesSelected, store],
+        shoppingList: ingredientsList,
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     }
-  };
+    //call filter endpoint whenever StoresSelected changes
+  }
   return (
     <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-between">
