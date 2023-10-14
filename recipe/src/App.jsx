@@ -55,8 +55,14 @@ function App() {
   ]; //possible stores 
 
   const handleStoreSelect = (store) =>{
-    setStoresSelected([...storesSelected, store]); //update the store state
-
+    if (storesSelected.includes(store)) {
+      // Store is already selected, remove it and change the background to white
+      setStoresSelected(storesSelected.filter((selectedStore) => selectedStore !== store));
+    } 
+    else {
+      // Store is not selected, add it and change the background to green
+      setStoresSelected([...storesSelected, store]);
+    }
   }
 
   //change of state when user types into the ingredients bar
@@ -112,8 +118,11 @@ function App() {
             <ul className='flex flex-col'>
               {ingredientsList.map((item, index) => (
                 <li key={index} className="mr-4 mb-4">
-                  <div class = "bg-blue-500 w-64 rounded-md cursor-pointer" key={index}>
+                  <div class = "flex p-4 bg-blue-500 w-full rounded-md cursor-pointer" key={index}>
                     <span>{item}</span>
+                    <span>1.95lb</span>
+                    <span>FreshCo, Bulk, $2.31/lb</span>
+                    <span>$4.50</span>
                     <img
                       src={bin} 
                       alt="Remove"
