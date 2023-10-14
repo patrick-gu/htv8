@@ -62,9 +62,12 @@ function App() {
 
   const [screenId, setScreenId] = useState(0);
 
-  const translate = ["", "translate-x-[-100vw]", "translate-x-[-200vw]", "translate-x-[-300vw]"][
-    screenId
-  ];
+  const translate = [
+    "",
+    "translate-x-[-100vw]",
+    "translate-x-[-200vw]",
+    "translate-x-[-300vw]",
+  ][screenId];
 
   return (
     <div className="w-full overflow-hidden h-full">
@@ -141,19 +144,19 @@ function Ingredients({
           <p className="text-center">
             Start by adding the ingredients you want to buy
           </p>
-            <div className="flex justify-center items-center">
-              <div className="block max-w-md p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 justify-center items-center">
-                <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
-                <ol className="list-decimal list-outside">
-                  <li>You enter the recipe that you want</li>
-                  <li>
-                    We find the best deals from local stores to fulfill your
-                    recipe
-                  </li>
-                  <li>You save time and money for that next meal!</li>
-                </ol>
-              </div>
+          <div className="flex justify-center items-center">
+            <div className="block max-w-md p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 justify-center items-center">
+              <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
+              <ol className="list-decimal list-outside">
+                <li>You enter the recipe that you want</li>
+                <li>
+                  We find the best deals from local stores to fulfill your
+                  recipe
+                </li>
+                <li>You save time and money for that next meal!</li>
+              </ol>
             </div>
+          </div>
         </div>
         <div>
           <h2 className="text-2xl font-bold text-center">Ingredients</h2>
@@ -216,88 +219,217 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId }) {
     }
   };
   return (
-      <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
-        <div className="flex justify-between">
-          <button
-            onClick={() => setScreenId(0)}
-            className="bg-blue-500 rounded-full py-2 px-4 text-white"
-          >
-            Back
-          </button>
-          <button
-            onClick={() => setScreenId(2)}
-            className="bg-blue-500 rounded-full py-2 px-4 text-white"
-          >
-            Next
-          </button>
-        </div>
-        <div className="space-y-8 flex-grow">
-          <h1 className="text-4xl font-bold">Let{"'"}s figure out your grocery run!</h1>
-          <div className="flex flex-col space-y-4">
-            <div className="flex flex-col space-y-3">
-              <div className="grid grid-cols-4 gap-4">
-                {stores.map((store, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleStoreSelect(store)}
-                    className={`cursor-pointer p-2 border rounded ${
-                      storesSelected.includes(store)
-                        ? "bg-green-500"
-                        : "bg-white"
-                    }`}
-                  >
-                    {store}
-                  </div>
-                ))}
-              </div>
-              <StoreSuggestions selectedStores={storesSelected} />
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+      <div className="flex justify-between">
+        <button
+          onClick={() => setScreenId(0)}
+          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+        >
+          Back
+        </button>
+        <button
+          onClick={() => setScreenId(2)}
+          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+        >
+          Next
+        </button>
+      </div>
+      <div className="space-y-8 flex-grow">
+        <h1 className="text-4xl font-bold">
+          Let{"'"}s figure out your grocery run!
+        </h1>
+        <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-3">
+            <div className="grid grid-cols-4 gap-4">
+              {stores.map((store, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleStoreSelect(store)}
+                  className={`cursor-pointer p-2 border rounded ${
+                    storesSelected.includes(store) ? "bg-green-500" : "bg-white"
+                  }`}
+                >
+                  {store}
+                </div>
+              ))}
             </div>
+            <StoreSuggestions selectedStores={storesSelected} />
           </div>
         </div>
-      </section>
+      </div>
+    </section>
   );
 }
 
 export function SuggestRecipes({ setScreenId }) {
-    return (
-        <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
-        <div className="flex justify-between">
-          <button
-            onClick={() => setScreenId(1)}
-            className="bg-blue-500 rounded-full py-2 px-4 text-white"
-          >
-            Back
-          </button>
-          <button
-            onClick={() => setScreenId(3)}
-            className="bg-blue-500 rounded-full py-2 px-4 text-white"
-          >
-            Next
-          </button>
-        </div>
-        <div className="space-y-8 flex-grow">
-          <h1 className="text-4xl font-bold">What are you cooking?</h1>
-        </div>
-      </section>
-    )
+  return (
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+      <div className="flex justify-between">
+        <button
+          onClick={() => setScreenId(1)}
+          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+        >
+          Back
+        </button>
+        <button
+          onClick={() => setScreenId(3)}
+          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+        >
+          Next
+        </button>
+      </div>
+      <div className="space-y-8 flex-grow">
+        <h1 className="text-4xl font-bold">What are you cooking?</h1>
+      </div>
+    </section>
+  );
 }
 
 export function GetYourStuff({ setScreenId }) {
-    return (
-        <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
-        <div className="flex justify-between">
+    const [nonce] = useState(() => Math.random().toString());
+    const [paybiltData, setPaybiltData] = useState(null);
+  return (
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+      <div className="flex justify-between">
+        <button
+          onClick={() => setScreenId(2)}
+          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+        >
+          Back
+        </button>
+      </div>
+      <div
+        className="space-y-8 flex-grow"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const formData = new FormData(form);
+          const dict = {};
+          for (const [key, value] of formData) {
+            dict[key] = value;
+          }
+          dict.items = [
+            {
+                "name": "tomato",
+                "quantity": 1,
+                "description": "just a tomato",
+                "unit_price": 2
+			}
+          ];
+          dict.nonce = nonce;
+          console.log(dict);
+          const res = await fetch("http://127.0.0.1:8080/paybilt", {
+            method: "POST",
+            body: JSON.stringify(dict),
+            headers: {
+                "Content-Type": "application/json"
+            }
+          });
+          const body = await res.json();
+          console.log(body);
+          setPaybiltData(body.message);
+        }}
+      >
+        <h1 className="text-4xl font-bold">Get your stuff</h1>
+        <form>
+          <label>
+            Email
+            <input type="email" name="email" className="border" />
+          </label>
+
+          <label>
+            Phone{" "}
+            <input
+              type="phone"
+              name="phone"
+              defaultValue="0000000000"
+              className="border p-2 rounded"
+            />
+          </label>
+
+          <label>
+            First Name{" "}
+            <input
+              type="text"
+              name="first_name"
+              defaultValue="King"
+              className="border"
+            />
+          </label>
+
+          <label>
+            Last Name
+            <input
+              type="text"
+              name="last_name"
+              defaultValue="Warrior"
+              className="border"
+            />
+          </label>
+
+          <label>
+            Address
+            <input
+              type="text"
+              name="address"
+              defaultValue="200 University Ave W"
+              className="border"
+            />
+          </label>
+
+          <label>
+            City
+            <input
+              type="text"
+              name="city"
+              defaultValue="Waterloo"
+              className="border"
+            />
+          </label>
+          <label>
+            Province (State)
+            <input
+              type="text"
+              name="state"
+              defaultValue="Ontario"
+              className="border"
+            />
+          </label>
+          <label>
+            Country{" "}
+            <select name="country" className="border">
+              <option defaultValue="CA">Canada</option>
+            </select>
+          </label>
+
+          <label>
+            Postal Code (Zip Code){" "}
+            <input
+              type="text"
+              name="zip_code"
+              defaultValue="N2L 3G1"
+              className="border"
+            />
+          </label>
+
           <button
-            onClick={() => setScreenId(2)}
+            type="submit"
             className="bg-blue-500 rounded-full py-2 px-4 text-white"
           >
-            Back
+            Pay with Paybilt
           </button>
-        </div>
-        <div className="space-y-8 flex-grow">
-          <h1 className="text-4xl font-bold">Get your stuff</h1>
-        </div>
-      </section>
-    )
+        </form>
+        {
+            paybiltData !== null && (
+                <>
+        <h2 className="text-2xl font-bold">Thanks for shopping! Please complete your transaction with Paybilt.</h2>
+                <div dangerouslySetInnerHTML={{__html: paybiltData}}></div>
+                </>
+            )
+        }
+      </div>
+    </section>
+  );
 }
 
 export default App;
