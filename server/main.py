@@ -197,8 +197,8 @@ async def flipp(sieve: Sieve):
                     if item['store'] in sieve.storesList:
                         categorizeByItem[shoppingListItem] = categorizeByItem[shoppingListItem]+[item]
     totalcost = 0
-    bestShoppingList = {}
-    counter = 0
+    bestShoppingList = []
+    counter=0
     for key in categorizeByItem.keys():
         itemCost = 1e9
         item = None
@@ -211,13 +211,13 @@ async def flipp(sieve: Sieve):
                 0 == 0
         if (item != None):
             newItem = FinalItem(
-                item['name'], item['store'], item['price'], item['img'], None, sieve.quantities[counter])
-            bestShoppingList[key] = newItem
+                item['name'], item['store'], item['price'], item['img'], None,sieve.quantities[counter])
+            bestShoppingList.append(newItem)
             totalcost += (float(item['price'])*sieve.quantities[counter])
         else:
             defaultItem = searchDefaultItems(key, sieve.quantities[counter])
             if defaultItem != None:
-                bestShoppingList[key] = defaultItem
+                bestShoppingList.append(defaultItem)
                 totalcost += (float(defaultItem.price)*defaultItem.quantity)
         counter += 1
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from 'axios';
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
-import food from "./assets/foods.jpg"
+import SearchResultItem from "./entry";
 function StoreSuggestions({ selectedStores }) {
   // For now, let's assume it's a simple array of suggestions
   const suggestions = [
@@ -41,19 +41,17 @@ function App() {
   const [ingredient, setIngredient] = useState(""); // State to capture the entered ingredient
   const [ingredientsList, setIngredientsList] = useState([]); // State to store the list of ingredients
   const [quantities, setQuantity] = useState([]);
-  const [storesSelected, setStoresSelected] = useState(["T&T Supermarket","No Frills","Walmart","FreshCo","Real Canadian Superstore","Sobeys","Metro","Food Basics","Loblaws","Costco"]);
+  const [storesSelected, setStoresSelected] = useState(["No Frills","Walmart","FreshCo","Real Canadian Superstore","Metro","Food Basics","Costco"]);
   const [currentCost, setCurrentCost] = useState(0);
   const [currentItems,setCurrentItems] = useState([]);
   const [recipe, setRecipe] = useState("");
+  const [currentList,setCurrentList] = useState([]);
   const stores = [
     "Walmart",
     "Metro",
     "Food Basics",
     "No Frills",
-    "Sobeys",
     "Real Canadian Superstore",
-    "Loblaws",
-    "T&T Supermarket",
     "Costco",
     "FreshCo"
   ]; //possible stores
@@ -82,6 +80,8 @@ function App() {
           quantities={quantities}
           setQuantity={setQuantity}
           setRecipe={setRecipe}
+          currentList={currentList}
+          setCurrentList={setCurrentList}
         />
         <Another
           stores={stores}
@@ -90,6 +90,8 @@ function App() {
           setScreenId={setScreenId}
           ingredientsList={ingredientsList}
           quantities={quantities}
+          currentList={currentList}
+          setCurrentList={setCurrentList}
         />
         <SuggestRecipes setScreenId={setScreenId} recipe={recipe} />
         <GetYourStuff setScreenId={setScreenId} />
@@ -108,11 +110,13 @@ function Ingredients({
   quantities,
   setQuantity,
   setRecipe,
+  currentList,
+  setCurrentList
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
     setIngredient(e.target.value); // Update the ingredient state when the input changes
-  };
+  };  
 
   const firstPageNext = async() =>{
     await axios.post('http://127.0.0.1:8080/filter', {
@@ -121,23 +125,24 @@ function Ingredients({
       quantities: quantities
     })
     .then(function (response) {
-      console.log(response);
+      setCurrentList(response.data[0]);
+      console.log(response.data[0])
     })
     .catch(function (error) {
       console.log(error);
     });
     setScreenId(1);
-    fetch("http://127.0.0.1:8080/recipe/suggest", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ ingredients: ingredientsList })
-    }).then(async (response) => {
-        const { content } = await response.json();
-        console.log(content);
-        setRecipe(content);
-    })
+    // fetch("http://127.0.0.1:8080/recipe/suggest", {
+    //     method: "POST",
+    //     headers: {
+    //         "Content-Type": "application/json"
+    //     },
+    //     body: JSON.stringify({ ingredients: ingredientsList })
+    // }).then(async (response) => {
+    //     const { content } = await response.json();
+    //     console.log(content);
+    //     setRecipe(content);
+    // })
   };
 
   //append ingredient to list
@@ -259,7 +264,7 @@ function Ingredients({
   );
 }
 
-function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingredientsList, quantities}) {
+function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingredientsList, quantities, currentList, setCurrentList}){
   const handleStoreSelect = async(store) => {
     if (storesSelected.includes(store)) {
       // Store is already selected, remove it and change the background to white
@@ -274,7 +279,8 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
         quantities: quantities,
         })
         .then(function (response) {
-          console.log(response);
+          setCurrentList(response.data[0]);
+          console.log(response.data[0])
         })
         .catch(function (error) {
           console.log(error);
@@ -289,7 +295,8 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
         quantities: quantities
         })
         .then(function (response) {
-          console.log(response);
+          setCurrentList(response.data[0]);
+          console.log(response.data[0])
         })
         .catch(function (error) {
           console.log(error);
@@ -333,6 +340,15 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
               ))}
             </div>
             <StoreSuggestions selectedStores={storesSelected} />
+            <div>
+              <div id="resultsList">
+              {
+                  currentList.map((result, id)=>{
+                      return <SearchResultItem item={result} key={id}/>
+                  })
+              }
+              </div> 
+            </div>
           </div>
         </div>
       </div>
