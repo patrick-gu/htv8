@@ -565,23 +565,23 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
     //call filter endpoint whenever StoresSelected changes
   }
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(0)}
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="bg-cambridge-blue rounded-full py-2 px-4 text-white font-bold"
         >
           Back
         </button>
         <button
           onClick={() => setScreenId(2)}
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="bg-cambridge-blue rounded-full py-2 px-4 text-white font-bold"
         >
           Next
         </button>
       </div>
       <div className="space-y-8 flex-grow">
-        <h1 className="text-4xl font-bold">
+        <h1 className="text-4xl font-bold text-raisin-black">
           Let{"'"}s figure out your grocery run!
         </h1>
         <div className="flex flex-col space-y-4">
@@ -591,8 +591,8 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
                 <div
                   key={index}
                   onClick={() => handleStoreSelect(store)}
-                  className={`cursor-pointer p-2 border rounded ${
-                    storesSelected.includes(store) ? "bg-green-500" : "bg-white"
+                  className={`cursor-pointer p-2 rounded ${
+                    storesSelected.includes(store) ? "bg-jungle-green" : "bg-hover-dgreen text-white"
                   }`}
                 >
                   {store}
