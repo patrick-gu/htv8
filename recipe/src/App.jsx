@@ -1,222 +1,205 @@
 import { useState } from "react";
-import axios from 'axios';
+import axios from "axios";
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
 import SearchResultItem from "./entry";
 
-
 function InitMapRoute() {
-  return( <div style={ {height: 600 + "px"}} id="map"></div> )
+  return <div style={{ height: 600 + "px" }} id="map"></div>;
 }
 
 function MapRoute() {
   let map;
 
   async function initMap() {
-
-
     let origin = { lat: 43.7867303, lng: -79.1920265 };
 
     // Initializing the map
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement, PinElement} = await google.maps.importLibrary("marker")
+    const { AdvancedMarkerElement, PinElement } =
+      await google.maps.importLibrary("marker");
 
     map = new Map(document.getElementById("map"), {
-    center: origin,
-    zoom: 15,
-    mapId: 'd5dc8cb3b04938bd',
+      center: origin,
+      zoom: 15,
+      mapId: "d5dc8cb3b04938bd",
     });
 
     const infoWindow = new InfoWindow();
-    
-
 
     const home = new AdvancedMarkerElement({
-        map,
-        position: origin,
-        title: "home",
-        content: new PinElement({ glyph: String(0) }).element
+      map,
+      position: origin,
+      title: "home",
+      content: new PinElement({ glyph: String(0) }).element,
     });
     home.addListener("click", ({ domEvent, latLng }) => {
-        const { target } = domEvent;
-  
-        infoWindow.close();
-        infoWindow.setContent(home.title);
-        infoWindow.open(home.map, home);
-      });
+      const { target } = domEvent;
 
+      infoWindow.close();
+      infoWindow.setContent(home.title);
+      infoWindow.open(home.map, home);
+    });
 
     const placesService = new google.maps.places.PlacesService(map);
 
+    let input = [
+      "Walmart Supercentre",
+      "Metro",
+      "Food Basics",
+      "NoFrills",
+      "Costco",
+      "FreshCo",
+      "Superstore",
+    ];
 
-    let input = ["Walmart Supercentre", "Metro", "Food Basics", "NoFrills", "Costco", "FreshCo", "Superstore"];
-
-    
     async function getLocations(stores) {
-        
-        let storetype;
-        function addPlaces(results, store) {
-            for (const location of results) {
-                const marker = new AdvancedMarkerElement({
-                    map,
-                    position: location.geometry.location,
-                    title: location.name,
-                    content: new PinElement({ glyph: String(store[0]) }).element
+      let storetype;
+      function addPlaces(results, store) {
+        for (const location of results) {
+          const marker = new AdvancedMarkerElement({
+            map,
+            position: location.geometry.location,
+            title: location.name,
+            content: new PinElement({ glyph: String(store[0]) }).element,
+          });
 
-                });
+          marker.addListener("click", ({ domEvent, latLng }) => {
+            const { target } = domEvent;
 
-                marker.addListener("click", ({ domEvent, latLng }) => {
-                    const { target } = domEvent;
-              
-                    infoWindow.close();
-                    infoWindow.setContent(marker.title);
-                    infoWindow.open(marker.map, marker);
-                  });    
+            infoWindow.close();
+            infoWindow.setContent(marker.title);
+            infoWindow.open(marker.map, marker);
+          });
+        }
+      }
+
+      // T&T, Sobeys, Superstore, loblaws has 2
+
+      for (let store of stores) {
+        console.log(store);
+        storetype = "supermarket";
+        if (
+          store === "NoFrills" ||
+          store === "FreshCo" ||
+          store === "Superstore"
+        )
+          storetype = "grocery_or_supermarket";
+        if (store === "Costco") storetype = "department_store";
+
+        const { results, status } = await new Promise((res, rej) => {
+          placesService.nearbySearch(
+            { location: origin, radius: 10000, name: store, type: storetype },
+            (results, status) => {
+              if (store === "Costco") {
+                results = results.filter(
+                  (v) => v.name !== "Costco Business Centre"
+                );
+              }
+
+              if (store === "Superstore") {
+                results = results.filter((v) =>
+                  v.name.includes("Real Canadian")
+                );
+              }
+
+              console.log(results);
+
+              res({ results, status });
             }
-        }
+          );
+        });
+        if (status !== "OK" || !results) return;
+        addPlaces(results, store);
+        locations.push(results);
+      }
 
-        // T&T, Sobeys, Superstore, loblaws has 2
-
-        for (let store of stores) {
-            console.log(store);
-            storetype = "supermarket"
-            if (store === "NoFrills" || store === "FreshCo" || store === "Superstore") storetype = "grocery_or_supermarket";
-            if (store === "Costco") storetype = "department_store";
-
-            const {results, status } = await new Promise((res, rej) => {
-                placesService.nearbySearch(
-                    { location: origin, radius: 10000, name: store, type: storetype},
-                    (results, status) => {
-
-                        if (store === "Costco") {
-                            results = results.filter((v) => (v.name !== "Costco Business Centre"))
-                        }
-
-                        if (store === "Superstore") {
-                            results = results.filter((v) => (v.name.includes("Real Canadian")))
-                        }
-
-                        console.log(results)
-
-                        
-                        res({ results, status});
-                    })
-            })
-            if (status !== "OK" || !results) return;
-            addPlaces(results, store);
-            locations.push(results);
-
-            
-        }
-        
-        getMinDist(origin, locations, [])
+      getMinDist(origin, locations, []);
     }
 
-
-
-
-
-    
     let locations = [];
 
     const directionsService = new google.maps.DirectionsService();
     const directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map);
 
-
-
-
     // Distance Function
     const distanceService = new google.maps.DistanceMatrixService();
 
-
-
     async function getMinDist(start, places, waypoints) {
-        let minRoute = [9999999999999999999, ""];
-        let request;
-        let result;
+      let minRoute = [9999999999999999999, ""];
+      let request;
+      let result;
 
+      for (let i = 0; i < places.length; i++) {
+        for (const store of places[i]) {
+          request = {
+            origins: [start],
+            destinations: [store.geometry.location],
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC,
+            avoidHighways: false,
+            avoidTolls: false,
+          };
 
-        for (let i = 0; i < places.length; i++) {
-            
-            for (const store of places[i]) {
+          result = await new Promise((res, rej) => {
+            distanceService.getDistanceMatrix(request).then((response) => {
+              let data = response.rows[0].elements[0];
+              let time = Number(data.duration.text.split(" ")[0]);
 
-                request = {
-                    origins: [start],
-                    destinations: [store.geometry.location],
-                    travelMode: google.maps.TravelMode.DRIVING,
-                    unitSystem: google.maps.UnitSystem.METRIC,
-                    avoidHighways: false,
-                    avoidTolls: false,
-                };
-                
-                result = await new Promise((res,rej) => {
-                    distanceService.getDistanceMatrix(request).then((response) => {
-                        
-                        let data = response.rows[0].elements[0];
-                        let time = Number(data.duration.text.split(" ")[0])
-
-                        if (time < minRoute[0]) {
-                            minRoute = [time, store.geometry.location, store.name, i];
-                        }
-                        res(minRoute);
-                    });
-                })
-            }
+              if (time < minRoute[0]) {
+                minRoute = [time, store.geometry.location, store.name, i];
+              }
+              res(minRoute);
+            });
+          });
         }
-        console.log(result[3], places, places[result[3]])
+      }
+      console.log(result[3], places, places[result[3]]);
 
-        waypoints.push(result[1]);
-        places.splice(result[3], 1);
+      waypoints.push(result[1]);
+      places.splice(result[3], 1);
 
-
-        if (places.length === 0) {
-            calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints);
-        } 
-        else {
-            // console.log(places)
-            getMinDist(result[1], places, waypoints);
-        }
-
+      if (places.length === 0) {
+        calculateAndDisplayRoute(
+          directionsService,
+          directionsRenderer,
+          waypoints
+        );
+      } else {
+        // console.log(places)
+        getMinDist(result[1], places, waypoints);
+      }
     }
 
+    function calculateAndDisplayRoute(
+      directionsService,
+      directionsRenderer,
+      pts
+    ) {
+      const waypts = [];
+      for (const pt of pts) {
+        waypts.push({ location: pt, stopover: true });
+      }
 
-
-
-    function calculateAndDisplayRoute(directionsService, directionsRenderer, pts) {
-
-        const waypts = [];
-        for (const pt of pts) {
-            waypts.push({location: pt, stopover: true})
-        }
-        
-
-
-
-        directionsService
+      directionsService
         .route({
-            origin: new google.maps.LatLng(origin.lat, origin.lng) ,
-            destination: new google.maps.LatLng(origin.lat, origin.lng),
-            waypoints: waypts,
-            optimizeWaypoints: true,
-            travelMode: google.maps.TravelMode.DRIVING,
+          origin: new google.maps.LatLng(origin.lat, origin.lng),
+          destination: new google.maps.LatLng(origin.lat, origin.lng),
+          waypoints: waypts,
+          optimizeWaypoints: true,
+          travelMode: google.maps.TravelMode.DRIVING,
         })
         .then((response) => {
-            directionsRenderer.setDirections(response);
-            console.log(response)
-        })
-
+          directionsRenderer.setDirections(response);
+          console.log(response);
+        });
     }
 
-    
     getLocations(input);
-
-    
-      
+  }
+  initMap();
 }
-  initMap();  
-}
-
 
 function StoreSuggestions({ selectedStores }) {
   // For now, let's assume it's a simple array of suggestions
@@ -237,7 +220,7 @@ function StoreSuggestions({ selectedStores }) {
   return (
     <div
       className={`suggestions ${
-        selectedStores.length > 0 ? "block" : "hidden " +"overflow-x-scroll" 
+        selectedStores.length > 0 ? "block" : "hidden " + "overflow-x-scroll"
       }`}
     >
       <h2 className="text-2xl font-bold">Store Suggestions:</h2>
@@ -256,11 +239,19 @@ function App() {
   const [ingredient, setIngredient] = useState(""); // State to capture the entered ingredient
   const [ingredientsList, setIngredientsList] = useState([]); // State to store the list of ingredients
   const [quantities, setQuantity] = useState([]);
-  const [storesSelected, setStoresSelected] = useState(["No Frills","Walmart","FreshCo","Real Canadian Superstore","Metro","Food Basics","Costco"]);
+  const [storesSelected, setStoresSelected] = useState([
+    "No Frills",
+    "Walmart",
+    "FreshCo",
+    "Real Canadian Superstore",
+    "Metro",
+    "Food Basics",
+    "Costco",
+  ]);
   const [currentCost, setCurrentCost] = useState(0);
-  const [currentItems,setCurrentItems] = useState([]);
+  const [currentItems, setCurrentItems] = useState([]);
   const [recipe, setRecipe] = useState("");
-  const [currentList,setCurrentList] = useState([]);
+  const [currentList, setCurrentList] = useState([]);
   const stores = [
     "Walmart",
     "Metro",
@@ -268,7 +259,7 @@ function App() {
     "No Frills",
     "Real Canadian Superstore",
     "Costco",
-    "FreshCo"
+    "FreshCo",
   ]; //possible stores
 
   const [screenId, setScreenId] = useState(0);
@@ -308,8 +299,8 @@ function App() {
           currentList={currentList}
           setCurrentList={setCurrentList}
         />
-        <SuggestRecipes setScreenId={setScreenId} recipe={recipe} />
         <GetYourStuff setScreenId={setScreenId} />
+        <SuggestRecipes setScreenId={setScreenId} recipe={recipe} />
       </main>
     </div>
   );
@@ -326,39 +317,42 @@ function Ingredients({
   setQuantity,
   setRecipe,
   currentList,
-  setCurrentList
+  setCurrentList,
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
     setIngredient(e.target.value); // Update the ingredient state when the input changes
-  };  
+  };
 
-  const firstPageNext = async() =>{
-    await axios.post('http://127.0.0.1:8080/filter', {
-      storesList: storesSelected,
-      shoppingList: ingredientsList,
-      quantities: quantities
-    })
-    .then(function (response) {
-      setCurrentList(response.data[0]);
-      console.log(response.data[0])
-      MapRoute();
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  const firstPageNext = async () => {
+    // console.log("fetching...")
+    axios
+      .post("http://127.0.0.1:8080/filter", {
+        storesList: storesSelected,
+        shoppingList: ingredientsList,
+        quantities: quantities,
+      })
+      .then(function (response) {
+        setCurrentList(response.data[0]);
+        console.log(response.data[0]);
+        MapRoute();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    // console.log("bump screen")
     setScreenId(1);
     fetch("http://127.0.0.1:8080/recipe/suggest", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ ingredients: ingredientsList })
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ingredients: ingredientsList }),
     }).then(async (response) => {
-        const { content } = await response.json();
-        console.log(content);
-        setRecipe(content);
-    })
+      const { content } = await response.json();
+      console.log(content);
+      setRecipe(content);
+    });
   };
 
   //append ingredient to list
@@ -366,7 +360,7 @@ function Ingredients({
     const defaultQuantity = 1; //add 1 of each quantity by default
     if (ingredient.trim() !== "") {
       setIngredientsList([...ingredientsList, ingredient]); // Append the ingredient to the list
-      setQuantity([...quantities, defaultQuantity]); //add the quantity 
+      setQuantity([...quantities, defaultQuantity]); //add the quantity
       setIngredient(""); // Clear the input field
     }
   };
@@ -374,20 +368,20 @@ function Ingredients({
   //called when user wants to increase quantity
   const handleQuantityUp = (index) => {
     const updatedList = [...quantities];
-    updatedList[index]++; // Decrease one 
+    updatedList[index]++; // Decrease one
     setQuantity(updatedList);
-  }
+  };
 
   //called when user wants to decrease quantity
   const handleQuantityDown = (index) => {
     const updatedList = [...quantities];
-    updatedList[index]--; // Decrease one 
-    if(updatedList[index] == 0){
-      handleRemoveIngredient(index); 
-      updatedList.splice(index, 1); //have to remove the quantity from the parallel array too 
+    updatedList[index]--; // Decrease one
+    if (updatedList[index] == 0) {
+      handleRemoveIngredient(index);
+      updatedList.splice(index, 1); //have to remove the quantity from the parallel array too
     }
     setQuantity(updatedList);
-  }
+  };
   //called when user wants to remove ingredients
   const handleRemoveIngredient = (index) => {
     const updatedList = [...ingredientsList];
@@ -413,8 +407,10 @@ function Ingredients({
         </button>
       </div>
       <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
-        <div className="flex flex-col gap-8 justify-center h-[20rem]" >
-          <h1 className="text-4xl text-raisin-black font-bold text-center font-sans">Grocery Run</h1>
+        <div className="flex flex-col gap-8 justify-center h-[20rem]">
+          <h1 className="text-4xl text-raisin-black font-bold text-center font-sans">
+            Grocery Run
+          </h1>
           <p className="text-center">
             Start by adding the ingredients you want to buy
           </p>
@@ -465,8 +461,18 @@ function Ingredients({
                         <span>Quantity: {quantities[index]}</span>
                       </div>
                       <div className="flex items-center">
-                        <img src={chevronUp} alt="Up" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityUp(index)} />
-                        <img src={chevronDown} alt="Down" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityDown(index)} />
+                        <img
+                          src={chevronUp}
+                          alt="Up"
+                          className="h-5 w-5 ml-2 cursor-pointer"
+                          onClick={() => handleQuantityUp(index)}
+                        />
+                        <img
+                          src={chevronDown}
+                          alt="Down"
+                          className="h-5 w-5 ml-2 cursor-pointer"
+                          onClick={() => handleQuantityDown(index)}
+                        />
                       </div>
                     </div>
                   </li>
@@ -480,46 +486,56 @@ function Ingredients({
   );
 }
 
-function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingredientsList, quantities, currentList, setCurrentList}){
-  const handleStoreSelect = async(store) => {
+function Another({
+  stores,
+  storesSelected,
+  setStoresSelected,
+  setScreenId,
+  ingredientsList,
+  quantities,
+  currentList,
+  setCurrentList,
+}) {
+  const handleStoreSelect = async (store) => {
     if (storesSelected.includes(store)) {
       // Store is already selected, remove it and change the background to white
-      const newStoresSelected=storesSelected.filter((selectedStore) => selectedStore !== store);
-      setStoresSelected(
-        newStoresSelected
+      const newStoresSelected = storesSelected.filter(
+        (selectedStore) => selectedStore !== store
       );
+      setStoresSelected(newStoresSelected);
 
-      await axios.post('http://127.0.0.1:8080/filter', {
-        storesList: newStoresSelected,
-        shoppingList: ingredientsList,
-        quantities: quantities,
+      await axios
+        .post("http://127.0.0.1:8080/filter", {
+          storesList: newStoresSelected,
+          shoppingList: ingredientsList,
+          quantities: quantities,
         })
         .then(function (response) {
           setCurrentList(response.data[0]);
-          console.log(response.data[0])
+          console.log(response.data[0]);
         })
         .catch(function (error) {
           console.log(error);
         });
-    }
-    else {
+    } else {
       // Store is not selected, add it and change the background to green
       setStoresSelected([...storesSelected, store]);
-      await axios.post('http://127.0.0.1:8080/filter', {
-        storesList: [...storesSelected, store],
-        shoppingList: ingredientsList,
-        quantities: quantities
+      await axios
+        .post("http://127.0.0.1:8080/filter", {
+          storesList: [...storesSelected, store],
+          shoppingList: ingredientsList,
+          quantities: quantities,
         })
         .then(function (response) {
           setCurrentList(response.data[0]);
-          console.log(response.data[0])
+          console.log(response.data[0]);
         })
         .catch(function (error) {
           console.log(error);
         });
     }
     //call filter endpoint whenever StoresSelected changes
-  }
+  };
   return (
     <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-between">
@@ -531,9 +547,15 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
         </button>
         <button
           onClick={() => setScreenId(2)}
+          className="bg-emerald-500 rounded-full py-2 px-4 text-white"
+        >
+          Get it delivered instead! (Paybilt)
+        </button>
+        <button
+          onClick={() => setScreenId(3)}
           className="bg-blue-500 rounded-full py-2 px-4 text-white"
         >
-          Next
+          I&apos;ll get it myself
         </button>
       </div>
       <div className="space-y-8 flex-grow">
@@ -559,12 +581,10 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
             <InitMapRoute />
             <div>
               <div id="resultsList">
-              {
-                  currentList.map((result, id)=>{
-                      return <SearchResultItem item={result} key={id}/>
-                  })
-              }
-              </div> 
+                {currentList.map((result, id) => {
+                  return <SearchResultItem item={result} key={id} />;
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -578,22 +598,24 @@ export function SuggestRecipes({ setScreenId, recipe }) {
     <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-between">
         <button
-          onClick={() => setScreenId(1)}
+          onClick={() => setScreenId(2)}
           className="bg-blue-500 rounded-full py-2 px-4 text-white"
         >
           Back
         </button>
-        <button
-          onClick={() => setScreenId(3)}
+        {/* <button
+          onClick={() => setScreenId(2)}
           className="bg-blue-500 rounded-full py-2 px-4 text-white"
         >
           Next
-        </button>
+        </button> */}
       </div>
       <div className="space-y-8 flex-grow">
         <h1 className="text-4xl font-bold">What are you cooking?</h1>
         <h2 className="text-xl">Here&apos;s a recipe suggestion:</h2>
-        <p className="whitespace-pre-line">{recipe.length !== 0 ? recipe : "Loading a recipe..."}</p>
+        <p className="whitespace-pre-line">
+          {recipe.length !== 0 ? recipe : "Loading a recipe..."}
+        </p>
       </div>
     </section>
   );
@@ -602,185 +624,163 @@ export function SuggestRecipes({ setScreenId, recipe }) {
 export function GetYourStuff({ setScreenId }) {
   const [nonce] = useState(() => Math.random().toString());
   const [paybiltData, setPaybiltData] = useState(null);
-  const [isOrdering, setIsOrdering] = useState(false);
   const [approved, setApproved] = useState(false);
   return (
     <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-between">
         <button
-          onClick={() => setScreenId(2)}
+          onClick={() => setScreenId(1)}
           className="bg-blue-500 rounded-full py-2 px-4 text-white"
         >
           Back
         </button>
       </div>
-      <div className="space-y-8 flex-grow">
-        <h1 className="text-4xl font-bold">Get your stuff</h1>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const formData = new FormData(form);
+          const dict = {};
+          for (const [key, value] of formData) {
+            dict[key] = value;
+          }
+          dict.items = [
+            {
+              name: "tomato",
+              quantity: 1,
+              description: "just a tomato",
+              unit_price: 2,
+            },
+          ];
+          dict.nonce = nonce;
+          console.log(dict);
+          const res = await fetch("http://127.0.0.1:8080/paybilt", {
+            method: "POST",
+            body: JSON.stringify(dict),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          const body = await res.json();
+          console.log(body);
+          const { txid } = body;
+          setPaybiltData(body.message);
+          // poll for updates from Paybilt
+          const timeout = setTimeout(async () => {
+            const res = await fetch(
+              `http://127.0.0.1:8080/paybilt/status/${txid}`
+            );
+            const body = await res.json();
+            console.log(body);
+            if (body.status === "approved") {
+              setApproved(true);
+              clearTimeout(timeout);
+            }
+          }, 5000);
+        }}
+      >
+        <label>
+          Email
+          <input type="email" name="email" className="border" />
+        </label>
+
+        <label>
+          Phone{" "}
+          <input
+            type="phone"
+            name="phone"
+            defaultValue="0000000000"
+            className="border p-2 rounded"
+          />
+        </label>
+
+        <label>
+          First Name{" "}
+          <input
+            type="text"
+            name="first_name"
+            defaultValue="King"
+            className="border"
+          />
+        </label>
+
+        <label>
+          Last Name
+          <input
+            type="text"
+            name="last_name"
+            defaultValue="Warrior"
+            className="border"
+          />
+        </label>
+
+        <label>
+          Address
+          <input
+            type="text"
+            name="address"
+            defaultValue="200 University Ave W"
+            className="border"
+          />
+        </label>
+
+        <label>
+          City
+          <input
+            type="text"
+            name="city"
+            defaultValue="Waterloo"
+            className="border"
+          />
+        </label>
+        <label>
+          Province (State)
+          <input
+            type="text"
+            name="state"
+            defaultValue="Ontario"
+            className="border"
+          />
+        </label>
+        <label>
+          Country{" "}
+          <select name="country" className="border">
+            <option defaultValue="CA">Canada</option>
+          </select>
+        </label>
+
+        <label>
+          Postal Code (Zip Code){" "}
+          <input
+            type="text"
+            name="zip_code"
+            defaultValue="N2L 3G1"
+            className="border"
+          />
+        </label>
+
         <button
-          className={`p-2 rounded-full ${
-            !isOrdering ? "bg-blue-500" : "bg-blue-100"
-          }`}
-          onClick={() => setIsOrdering(false)}
+          type="submit"
+          className="bg-blue-500 rounded-full py-2 px-4 text-white"
         >
-          I&apos;ll get it myself
+          Pay with Paybilt
         </button>
-        <button
-          className={`p-2 rounded-full ${
-            isOrdering ? "bg-blue-500" : "bg-blue-100"
-          }`}
-          onClick={() => setIsOrdering(true)}
-        >
-          Order it (Paybilt integration)
-        </button>
-        {isOrdering && (
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const form = e.target;
-              const formData = new FormData(form);
-              const dict = {};
-              for (const [key, value] of formData) {
-                dict[key] = value;
-              }
-              dict.items = [
-                {
-                  name: "tomato",
-                  quantity: 1,
-                  description: "just a tomato",
-                  unit_price: 2,
-                },
-              ];
-              dict.nonce = nonce;
-              console.log(dict);
-              const res = await fetch("http://127.0.0.1:8080/paybilt", {
-                method: "POST",
-                body: JSON.stringify(dict),
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-              const body = await res.json();
-              console.log(body);
-              const {txid} = body;
-              setPaybiltData(body.message);
-              // poll for updates from Paybilt
-              const timeout = setTimeout(async () => {
-                const res = await fetch(
-                  `http://127.0.0.1:8080/paybilt/status/${txid}`,
-                );
-                const body = await res.json();
-                console.log(body);
-                if (body.status === "approved") {
-                  setApproved(true);
-                  clearTimeout(timeout);
-                }
-              }, 5000);
-            }}
-          >
-            <label>
-              Email
-              <input type="email" name="email" className="border" />
-            </label>
-
-            <label>
-              Phone{" "}
-              <input
-                type="phone"
-                name="phone"
-                defaultValue="0000000000"
-                className="border p-2 rounded"
-              />
-            </label>
-
-            <label>
-              First Name{" "}
-              <input
-                type="text"
-                name="first_name"
-                defaultValue="King"
-                className="border"
-              />
-            </label>
-
-            <label>
-              Last Name
-              <input
-                type="text"
-                name="last_name"
-                defaultValue="Warrior"
-                className="border"
-              />
-            </label>
-
-            <label>
-              Address
-              <input
-                type="text"
-                name="address"
-                defaultValue="200 University Ave W"
-                className="border"
-              />
-            </label>
-
-            <label>
-              City
-              <input
-                type="text"
-                name="city"
-                defaultValue="Waterloo"
-                className="border"
-              />
-            </label>
-            <label>
-              Province (State)
-              <input
-                type="text"
-                name="state"
-                defaultValue="Ontario"
-                className="border"
-              />
-            </label>
-            <label>
-              Country{" "}
-              <select name="country" className="border">
-                <option defaultValue="CA">Canada</option>
-              </select>
-            </label>
-
-            <label>
-              Postal Code (Zip Code){" "}
-              <input
-                type="text"
-                name="zip_code"
-                defaultValue="N2L 3G1"
-                className="border"
-              />
-            </label>
-
-            <button
-              type="submit"
-              className="bg-blue-500 rounded-full py-2 px-4 text-white"
-            >
-              Pay with Paybilt
-            </button>
-          </form>
-        )}
-        {paybiltData !== null &&
-          (approved ? (
-            <>
-              <h2 className="text-2xl font-bold">
-                Payment complete! Thanks for shopping.
-              </h2>
-            </>
-          ) : (
-            <>
-              <h2 className="text-2xl font-bold">
-                Please complete your transaction with Paybilt.
-              </h2>
-              <div dangerouslySetInnerHTML={{ __html: paybiltData }}></div>
-            </>
-          ))}
-      </div>
+      </form>
+      {paybiltData !== null &&
+        (approved ? (
+          <>
+            <h2 className="text-2xl font-bold">
+              Payment complete! Thanks for shopping.
+            </h2>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold">
+              Please complete your transaction with Paybilt.
+            </h2>
+            <div dangerouslySetInnerHTML={{ __html: paybiltData }}></div>
+          </>
+        ))}
     </section>
   );
 }
