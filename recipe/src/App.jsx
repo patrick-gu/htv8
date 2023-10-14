@@ -1,25 +1,34 @@
 import { useState } from "react";
 import axios from 'axios';
 import bin from "./assets/bin.png";
-
+import chevronDown from "./assets/chevron-down.png";
+import chevronUp from "./assets/chevron-up.png";
 function StoreSuggestions({ selectedStores }) {
   // For now, let's assume it's a simple array of suggestions
   const suggestions = [
     "Remove FreshCo from your run for $3.54 more to save 15 minutes on your run",
     "Add FoodBasics to your run to save $15.20 for 10 minutes on your run",
     "Don't eat to save 100% of the costs on this run",
+    "Fourth suggestion here",
+    "Fifth suggestion here",
+    "Eat 50% to to save 50% of the costs on this run",
+    "Eat 50% to to save 50% of the costs on this run",
+    "Eat 50% to to save 50% of the costs on this run",
+    "Eat 50% to to save 50% of the costs on this run",
+    "Eat 50% to to save 50% of the costs on this run",
+    "Eat 50% to to save 50% of the costs on this run",
   ];
 
   return (
     <div
       className={`suggestions ${
-        selectedStores.length > 0 ? "block" : "hidden"
+        selectedStores.length > 0 ? "block" : "hidden " +"overflow-x-scroll" 
       }`}
     >
       <h2 className="text-2xl font-bold">Store Suggestions:</h2>
       <div className="flex space-x-2">
         {suggestions.map((suggestion, index) => (
-          <div className="bg-yellow-100 w-fit+1 h-fit+2 p-2" key={index}>
+          <div className="bg-yellow-100 w-3/5 h-3/5 p-2" key={index}>
             {suggestion}
           </div>
         ))}
@@ -31,6 +40,7 @@ function StoreSuggestions({ selectedStores }) {
 function App() {
   const [ingredient, setIngredient] = useState(""); // State to capture the entered ingredient
   const [ingredientsList, setIngredientsList] = useState([]); // State to store the list of ingredients
+  const [quantities, setQuantity] = useState([]);
   const [storesSelected, setStoresSelected] = useState(["T&T Supermarket","No Frills","Walmart","FreshCo","Real Canadian Superstore","Sobeys","Metro","Food Basics","Loblaws","Costco"]);
   const [currentCost, setCurrentCost] = useState(0);
   const [currentItems,setCurrentItems] = useState([]);
@@ -68,6 +78,8 @@ function App() {
           setIngredientsList={setIngredientsList}
           setScreenId={setScreenId}
           storesSelected={storesSelected}
+          quantities={quantities}
+          setQuantity={setQuantity}
         />
         <Another
           stores={stores}
@@ -90,6 +102,8 @@ function Ingredients({
   setIngredientsList,
   setScreenId,
   storesSelected,
+  quantities,
+  setQuantity
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
@@ -112,12 +126,31 @@ function Ingredients({
 
   //append ingredient to list
   const handleAddIngredient = () => {
+    const defaultQuantity = 1; //add 1 of each quantity by default
     if (ingredient.trim() !== "") {
       setIngredientsList([...ingredientsList, ingredient]); // Append the ingredient to the list
+      setQuantity([...quantities, defaultQuantity]); //add the quantity 
       setIngredient(""); // Clear the input field
     }
   };
 
+  //called when user wants to increase quantity
+  const handleQuantityUp = (index) => {
+    const updatedList = [...quantities];
+    updatedList[index]++; // Decrease one 
+    setQuantity(updatedList);
+  }
+
+  //called when user wants to decrease quantity
+  const handleQuantityDown = (index) => {
+    const updatedList = [...quantities];
+    updatedList[index]--; // Decrease one 
+    if(updatedList[index] == 0){
+      handleRemoveIngredient(index); 
+      updatedList.splice(index, 1); //have to remove the quantity from the parallel array too 
+    }
+    setQuantity(updatedList);
+  }
   //called when user wants to remove ingredients
   const handleRemoveIngredient = (index) => {
     const updatedList = [...ingredientsList];
@@ -189,9 +222,11 @@ function Ingredients({
                       key={index}
                     >
                       <span>{item}</span>
-                      <span>1.95lb</span>
+                      <span>Quantity:{quantities[index]}</span>
                       <span>FreshCo, Bulk, $2.31/lb</span>
                       <span>$4.50</span>
+                      <img src={chevronUp} alt="Up" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityUp(index)} />
+                      <img src={chevronDown} alt="Down" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityDown(index)} />
                       <img
                         src={bin}
                         alt="Remove"
