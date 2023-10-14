@@ -2,10 +2,10 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import food from './assets/foods.jpg';
+import bin from './assets/bin.png';
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
   const [ingredient, setIngredient] = useState(''); // State to capture the entered ingredient
   const [ingredientsList, setIngredientsList] = useState([]); // State to store the list of ingredients
 
@@ -26,6 +26,12 @@ function App() {
     }
   };
 
+  const handleRemoveIngredient = (index) => {
+    const updatedList = [...ingredientsList];
+    updatedList.splice(index, 1); // Remove the ingredient at the specified index
+    setIngredientsList(updatedList);
+  };
+
   return (
     <>
       <h1 class="text-4xl font-bold mb-6">Grocery Run</h1>
@@ -37,9 +43,19 @@ function App() {
             Enter
           </button>
           <div class="ingredients">
-            <ul>
+            <ul className='flex flex-col'>
               {ingredientsList.map((item, index) => (
-                <li key={index}>{item}</li>
+                <li key={index} className="mr-4 mb-4">
+                  <div class = "bg-blue-500 w-64 rounded-md" key={index}>
+                    <span>{item}</span>
+                    <img
+                      src={bin} 
+                      alt="Remove"
+                      class= "h-5 w-5 ml-2 cursor-pointer"
+                      onClick={() => handleRemoveIngredient(index)}
+                    />
+                  </div>
+                </li>
               ))}
             </ul>
           </div>
@@ -52,9 +68,6 @@ function App() {
               <li>We find the best deals from local stores to fulfill your recipe</li>
               <li>You save time and money for that next meal!</li>
             </ol>
-          <button onClick={() => setCount((count) => count + 1)}>
-            count is {count}
-          </button>
         </div>
         </div>
         
