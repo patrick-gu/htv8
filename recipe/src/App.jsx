@@ -416,13 +416,15 @@ export function GetYourStuff({ setScreenId }) {
               const {txid} = body;
               setPaybiltData(body.message);
               // poll for updates from Paybilt
-              setTimeout(async () => {
+              const timeout = setTimeout(async () => {
                 const res = await fetch(
                   `http://127.0.0.1:8080/paybilt/status/${txid}`,
                 );
                 const body = await res.json();
+                console.log(body);
                 if (body.status === "approved") {
                   setApproved(true);
+                  clearTimeout(timeout);
                 }
               }, 5000);
             }}
