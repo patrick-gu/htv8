@@ -56,24 +56,28 @@ function MapRoute() {
         
         let storetype;
         function addPlaces(results, store) {
-            for (const location of results) {
-                const marker = new AdvancedMarkerElement({
-                    map,
-                    position: location.geometry.location,
-                    title: location.name,
-                    content: new PinElement({ glyph: String(store[0]) }).element
 
-                });
+            // for (const location of results) {
+            //     const marker = new AdvancedMarkerElement({
+            //         map,
+            //         position: location.geometry.location,
+            //         title: location.name,
+            //         content: new PinElement({ glyph: String(store[0]) }).element
 
-                marker.addListener("click", ({ domEvent, latLng }) => {
-                    const { target } = domEvent;
+            //     });
+
+            //     marker.addListener("click", ({ domEvent, latLng }) => {
+            //         const { target } = domEvent;
               
-                    infoWindow.close();
-                    infoWindow.setContent(marker.title);
-                    infoWindow.open(marker.map, marker);
-                  });    
-            }
+            //         infoWindow.close();
+            //         infoWindow.setContent(marker.title);
+            //         infoWindow.open(marker.map, marker);
+            //       });    
+            // }
+
         }
+
+
 
         // T&T, Sobeys, Superstore, loblaws has 2
 
@@ -109,7 +113,7 @@ function MapRoute() {
             
         }
         
-        getMinDist(origin, locations, [])
+        getMinDist(origin, locations, [], 0)
     }
 
 
@@ -120,8 +124,13 @@ function MapRoute() {
     let locations = [];
 
     const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer();
+    const directionsRenderer = new google.maps.DirectionsRenderer({
+      suppressInfoWindows: true,
+      suppressMarkers: true,
+      map: map
+    });
     directionsRenderer.setMap(map);
+
 
 
 
@@ -131,7 +140,7 @@ function MapRoute() {
 
 
 
-    async function getMinDist(start, places, waypoints) {
+    async function getMinDist(start, places, waypoints, time) {
         let minRoute = [9999999999999999999, ""];
         let request;
         let result;
@@ -166,16 +175,38 @@ function MapRoute() {
         }
         console.log(result[3], places, places[result[3]])
 
+
+
         waypoints.push(result[1]);
         places.splice(result[3], 1);
 
+        time = time += result[0]
+
+
+        const marker = new AdvancedMarkerElement({
+            map,
+            position: result[1],
+            title: result[2],
+            content: new PinElement({ glyph: String(result[2])[0] }).element
+
+        });
+
+        marker.addListener("click", ({ domEvent, latLng }) => {
+            const { target } = domEvent;
+      
+            infoWindow.close();
+            infoWindow.setContent(marker.title);
+            infoWindow.open(marker.map, marker);
+          });    
+
+
 
         if (places.length === 0) {
-            calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints);
+            calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints, time);
         } 
         else {
             // console.log(places)
-            getMinDist(result[1], places, waypoints);
+            getMinDist(result[1], places, waypoints, time);
         }
 
     }
@@ -183,11 +214,14 @@ function MapRoute() {
 
 
 
-    function calculateAndDisplayRoute(directionsService, directionsRenderer, pts) {
+    function calculateAndDisplayRoute(directionsService, directionsRenderer, pts, time) {
 
-        const waypts = [];
-        for (const pt of pts) {
-            waypts.push({location: pt, stopover: true})
+      const waypts = [];
+      for (const pt of pts) {
+    
+
+          waypts.push({location: pt, stopover: true})
+
         }
         
 
@@ -203,7 +237,9 @@ function MapRoute() {
         })
         .then((response) => {
             directionsRenderer.setDirections(response);
-            console.log(response)
+            console.log(response);
+            console.log(time);
+            // time = total trip time
         })
 
     }
