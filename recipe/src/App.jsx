@@ -113,7 +113,8 @@ function Ingredients({
   const firstPageNext = async() =>{
     await axios.post('http://127.0.0.1:8080/filter', {
       storesList: storesSelected,
-      shoppingList: ingredientsList
+      shoppingList: ingredientsList,
+      quantities: quantities
     })
     .then(function (response) {
       console.log(response);
@@ -257,6 +258,7 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
       await axios.post('http://127.0.0.1:8080/filter', {
         storesList: newStoresSelected,
         shoppingList: ingredientsList,
+        quantities: quantities,
         })
         .then(function (response) {
           console.log(response);
@@ -271,6 +273,7 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
       await axios.post('http://127.0.0.1:8080/filter', {
         storesList: [...storesSelected, store],
         shoppingList: ingredientsList,
+        quantities: quantities
         })
         .then(function (response) {
           console.log(response);
