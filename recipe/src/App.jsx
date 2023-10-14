@@ -62,34 +62,29 @@ function App() {
 
   const [screenId, setScreenId] = useState(0);
 
-  const translate = ["", "translate-x-[-100vw]", "translate-x-[-200vw]"][screenId];
+  const translate = ["", "translate-x-[-100vw]", "translate-x-[-200vw]"][
+    screenId
+  ];
 
   return (
-    <div className="w-full overflow-hidden">
-        <main className={`w-[300vw] ${translate} transition-transform`}>
-            <div className="inline-block w-screen">
-
-            <Ingredients
-                ingredient={ingredient}
-                setIngredient={setIngredient}
-                ingredientsList={ingredientsList}
-                setIngredientsList={setIngredientsList}
-                setScreenId={setScreenId}
-            />
-            </div>
-            <div className="inline-block w-screen">
-
-            <Another
-                stores={stores}
-                storesSelected={storesSelected}
-                setStoresSelected={setStoresSelected}
-                setScreenId={setScreenId}
-            />
-            </div>
-            <div className="inline-block w-screen">
-
-            </div>
-        </main>
+    <div className="w-full overflow-hidden h-full">
+      <main
+        className={`w-[300vw] ${translate} transition-transform h-full flex flex-row`}
+      >
+        <Ingredients
+          ingredient={ingredient}
+          setIngredient={setIngredient}
+          ingredientsList={ingredientsList}
+          setIngredientsList={setIngredientsList}
+          setScreenId={setScreenId}
+        />
+        <Another
+          stores={stores}
+          storesSelected={storesSelected}
+          setStoresSelected={setStoresSelected}
+          setScreenId={setScreenId}
+        />
+      </main>
     </div>
   );
 }
@@ -129,54 +124,65 @@ function Ingredients({
   };
 
   return (
-    <section className="grid grid-cols-1 gap-8 space-y-8 p-8 md:grid-cols-2 w-screen">
-      <div className="flex flex-col gap-4 justify-center">
-        <h1 className="text-4xl font-bold">Grocery Run</h1>
-        <p>Start by adding the ingredients you want to buy</p>
+    <section className="w-screen min-h-screen p-8 flex flex-col">
+      <div className="flex justify-end">
+        <button
+          onClick={() => setScreenId(1)}
+          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+        >
+          Next
+        </button>
       </div>
-      <div>
-        <h2 className="text-2xl">Ingredients</h2>
-        <div className="mb-4">
-          <input
-            className="shadow appearance-none border rounded w-2/6 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
-            id="ingredient"
-            type="text"
-            placeholder="Enter your ingredient!"
-            value={ingredient}
-            onChange={handleIngredientChange}
-            onKeyUp={handleEnter}
-          ></input>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-            onClick={handleAddIngredient}
-          >
-            Enter
-          </button>
-          <div className="ingredients">
-            <ul className="flex flex-col">
-              {ingredientsList.map((item, index) => (
-                <li key={index} className="mr-4 mb-4">
-                  <div
-                    className="flex p-4 bg-blue-500 w-full rounded-md cursor-pointer"
-                    key={index}
-                  >
-                    <span>{item}</span>
-                    <span>1.95lb</span>
-                    <span>FreshCo, Bulk, $2.31/lb</span>
-                    <span>$4.50</span>
-                    <img
-                      src={bin}
-                      alt="Remove"
-                      className="h-5 w-5 ml-2 cursor-pointer"
-                      onClick={() => handleRemoveIngredient(index)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
+      <div className="grid grid-cols-1 gap-8 space-y-8 md:grid-cols-2 flex-grow">
+        <div className="flex flex-col gap-4 justify-center h-full">
+          <h1 className="text-4xl font-bold text-center">Grocery Run</h1>
+          <p className="text-center">
+            Start by adding the ingredients you want to buy
+          </p>
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-center">Ingredients</h2>
+          <div className="mb-4">
+            <input
+              className="shadow appearance-none border rounded w-2/6 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
+              id="ingredient"
+              type="text"
+              placeholder="Enter your ingredient!"
+              value={ingredient}
+              onChange={handleIngredientChange}
+              onKeyUp={handleEnter}
+            ></input>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+              onClick={handleAddIngredient}
+            >
+              Enter
+            </button>
+            <div className="ingredients">
+              <ul className="flex flex-col">
+                {ingredientsList.map((item, index) => (
+                  <li key={index} className="mr-4 mb-4">
+                    <div
+                      className="flex p-4 bg-blue-500 w-full rounded-md cursor-pointer"
+                      key={index}
+                    >
+                      <span>{item}</span>
+                      <span>1.95lb</span>
+                      <span>FreshCo, Bulk, $2.31/lb</span>
+                      <span>$4.50</span>
+                      <img
+                        src={bin}
+                        alt="Remove"
+                        className="h-5 w-5 ml-2 cursor-pointer"
+                        onClick={() => handleRemoveIngredient(index)}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
-        <button onClick={() => setScreenId(1)}>Next</button>
       </div>
     </section>
   );
@@ -196,44 +202,45 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId }) {
   };
   return (
     <>
-        <section className="w-screen">
-            <button onClick={() => setScreenId(0)}>Back</button>
+      <section className="w-screen">
+        <button onClick={() => setScreenId(0)}>Back</button>
 
-      <h1 className="text-4xl font-bold mb-6">Grocery Run</h1>
-      <div className="flex flex-col space-y-4">
-        <div className="flex flex-col space-y-3">
-          <h2 className="text-2xl font-bold">
-            Let{"'"}s figure out your grocery run!
-          </h2>
-          <div className="grid grid-cols-4 gap-4">
-            {stores.map((store, index) => (
-              <div
-                key="index"
-                onClick={() => handleStoreSelect(store)}
-                className={`cursor-pointer p-2 border rounded ${
-                  storesSelected.includes(store) ? "bg-green-500" : "bg-white"
-                }`}
-              >
-                {store}
-              </div>
-            ))}
+        <h1 className="text-4xl font-bold mb-6">Grocery Run</h1>
+        <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-3">
+            <h2 className="text-2xl font-bold">
+              Let{"'"}s figure out your grocery run!
+            </h2>
+            <div className="grid grid-cols-4 gap-4">
+              {stores.map((store, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleStoreSelect(store)}
+                  className={`cursor-pointer p-2 border rounded ${
+                    storesSelected.includes(store) ? "bg-green-500" : "bg-white"
+                  }`}
+                >
+                  {store}
+                </div>
+              ))}
+            </div>
+            <StoreSuggestions selectedStores={storesSelected} />
           </div>
-          <StoreSuggestions selectedStores={storesSelected} />
-        </div>
-        <div className="flex justify-center items-center">
-          <div className="block max-w-md p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 justify-center items-center">
-            <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
-            <ol className="list-decimal list-outside">
-              <li>You enter the recipe that you want</li>
-              <li>
-                We find the best deals from local stores to fulfill your recipe
-              </li>
-              <li>You save time and money for that next meal!</li>
-            </ol>
+          <div className="flex justify-center items-center">
+            <div className="block max-w-md p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 justify-center items-center">
+              <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
+              <ol className="list-decimal list-outside">
+                <li>You enter the recipe that you want</li>
+                <li>
+                  We find the best deals from local stores to fulfill your
+                  recipe
+                </li>
+                <li>You save time and money for that next meal!</li>
+              </ol>
+            </div>
           </div>
         </div>
-      </div>
-        </section>
+      </section>
     </>
   );
 }
