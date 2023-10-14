@@ -1,0 +1,11 @@
+{
+  "name": "htv8",
+  "version": "1.0.0",
+  "description": "Hack the Valley 8 Project\r Created with Vite, React",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
