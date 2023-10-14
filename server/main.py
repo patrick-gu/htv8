@@ -1,5 +1,6 @@
 import uvicorn
-import requests
+# import requests
+import httpx
 import re
 import json
 from fastapi import Request, FastAPI, Body
@@ -37,10 +38,10 @@ app.add_middleware(
 )
 
 
-session = requests.session()
-my_headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'}
-session.headers.update(my_headers)
+# session = requests.session()
+# my_headers = {
+#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'}
+# session.headers.update(my_headers)
 
 
 class Store:
@@ -343,14 +344,14 @@ async def payment_paybilt(request: Request):
         "Accept": "application/json",
         "Authorization": f"Bearer {PAYBILT_TOKEN}"
     }
-    response = requests.request(
+    response = httpx.request(
         "POST", url, json=paybilt_body, headers=headers)
     return response.json()
 
 
 @app.get('/paybilt/status/{txid}')
 async def paybilt_status_proxy(txid: str):
-    response = requests.request("GET", f"https://sandbox.pp.paybilt.com/api/v2/status/{txid}", headers={
+    response = httpx.request("GET", f"https://sandbox.pp.paybilt.com/api/v2/status/{txid}", headers={
         "Authorization": f"Bearer {PAYBILT_TOKEN}"})
     return response.json()
 
@@ -374,8 +375,8 @@ async def recipe_suggestion(request: Request):
     }
 
     OPENAI_TOKEN = os.environ["OPENAI_TOKEN"]
-    response = requests.request(
-        "POST", "https://api.openai.com/v1/chat/completions", json=payload, headers={"Authorization": f"Bearer {OPENAI_TOKEN}"})
+    response = httpx.request(
+        "POST", "https://api.openai.com/v1/chat/completions", json=payload, headers={"Authorization": f"Bearer {OPENAI_TOKEN}"}, timeout=httpx.Timeout(60.0))
     json = response.json()
     print(json)
     return {"content": json["choices"][0]["message"]["content"]}
