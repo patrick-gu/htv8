@@ -252,8 +252,9 @@ function MapRoute() {
         });
     }
 
-    getLocations(input);
   }
+    getLocations(input);
+}
   initMap();
 }
 
