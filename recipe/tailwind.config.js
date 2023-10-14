@@ -15,7 +15,19 @@ export default {
         'hover-dgreen': '#0D4533',
       },
       animation: {
-        'bounce': 'bounce 1s'
+        'bounce': 'bounce 2.5s'
+      },
+      keyframes: {
+        bounce: {
+          '0%, 100%': {
+            transform: 'translateY(-5%)',
+            animationTimingFunction: 'cubic-bezier(0.1, 0, 1, 0.1)',
+          },
+          '50%': {
+            transform: 'translateY(0)',
+            animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)'
+          },
+        }
       }
     },
   },

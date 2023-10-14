@@ -54,82 +54,92 @@ function MapRoute() {
     ];
 
     async function getLocations(stores) {
-      let storetype;
-      function addPlaces(results, store) {
-        for (const location of results) {
-          const marker = new AdvancedMarkerElement({
-            map,
-            position: location.geometry.location,
-            title: location.name,
-            content: new PinElement({ glyph: String(store[0]) }).element,
-          });
+        
+        let storetype;
+        function addPlaces(results, store) {
 
-          marker.addListener("click", ({ domEvent, latLng }) => {
-            const { target } = domEvent;
+            // for (const location of results) {
+            //     const marker = new AdvancedMarkerElement({
+            //         map,
+            //         position: location.geometry.location,
+            //         title: location.name,
+            //         content: new PinElement({ glyph: String(store[0]) }).element
 
-            infoWindow.close();
-            infoWindow.setContent(marker.title);
-            infoWindow.open(marker.map, marker);
-          });
+            //     });
+
+            //     marker.addListener("click", ({ domEvent, latLng }) => {
+            //         const { target } = domEvent;
+              
+            //         infoWindow.close();
+            //         infoWindow.setContent(marker.title);
+            //         infoWindow.open(marker.map, marker);
+            //       });    
+            // }
+
         }
-      }
 
-      // T&T, Sobeys, Superstore, loblaws has 2
 
-      for (let store of stores) {
-        console.log(store);
-        storetype = "supermarket";
-        if (
-          store === "NoFrills" ||
-          store === "FreshCo" ||
-          store === "Superstore"
-        )
-          storetype = "grocery_or_supermarket";
-        if (store === "Costco") storetype = "department_store";
 
-        const { results, status } = await new Promise((res, rej) => {
-          placesService.nearbySearch(
-            { location: origin, radius: 10000, name: store, type: storetype },
-            (results, status) => {
-              if (store === "Costco") {
-                results = results.filter(
-                  (v) => v.name !== "Costco Business Centre"
-                );
-              }
+        // T&T, Sobeys, Superstore, loblaws has 2
 
-              if (store === "Superstore") {
-                results = results.filter((v) =>
-                  v.name.includes("Real Canadian")
-                );
-              }
+        for (let store of stores) {
+            console.log(store);
+            storetype = "supermarket"
+            if (store === "NoFrills" || store === "FreshCo" || store === "Superstore") storetype = "grocery_or_supermarket";
+            if (store === "Costco") storetype = "department_store";
 
-              console.log(results);
+            const {results, status } = await new Promise((res, rej) => {
+                placesService.nearbySearch(
+                    { location: origin, radius: 10000, name: store, type: storetype},
+                    (results, status) => {
 
-              res({ results, status });
-            }
-          );
-        });
-        if (status !== "OK" || !results) return;
-        addPlaces(results, store);
-        locations.push(results);
-      }
+                        if (store === "Costco") {
+                            results = results.filter((v) => (v.name !== "Costco Business Centre"))
+                        }
 
-      getMinDist(origin, locations, []);
+                        if (store === "Superstore") {
+                            results = results.filter((v) => (v.name.includes("Real Canadian")))
+                        }
+
+                        console.log(results)
+
+                        
+                        res({ results, status});
+                    })
+            })
+            if (status !== "OK" || !results) return;
+            addPlaces(results, store);
+            locations.push(results);
+
+            
+        }
+        
+        getMinDist(origin, locations, [], 0)
     }
 
     let locations = [];
 
     const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer();
+    const directionsRenderer = new google.maps.DirectionsRenderer({
+      suppressInfoWindows: true,
+      suppressMarkers: true,
+      map: map
+    });
     directionsRenderer.setMap(map);
+
+
+
+
 
     // Distance Function
     const distanceService = new google.maps.DistanceMatrixService();
 
-    async function getMinDist(start, places, waypoints) {
-      let minRoute = [9999999999999999999, ""];
-      let request;
-      let result;
+
+
+    async function getMinDist(start, places, waypoints, time) {
+        let minRoute = [9999999999999999999, ""];
+        let request;
+        let result;
 
       for (let i = 0; i < places.length; i++) {
         for (const store of places[i]) {
@@ -157,8 +167,39 @@ function MapRoute() {
       }
       console.log(result[3], places, places[result[3]]);
 
-      waypoints.push(result[1]);
-      places.splice(result[3], 1);
+
+
+        waypoints.push(result[1]);
+        places.splice(result[3], 1);
+
+        time = time += result[0]
+
+
+        const marker = new AdvancedMarkerElement({
+            map,
+            position: result[1],
+            title: result[2],
+            content: new PinElement({ glyph: String(result[2])[0] }).element
+
+        });
+
+        marker.addListener("click", ({ domEvent, latLng }) => {
+            const { target } = domEvent;
+      
+            infoWindow.close();
+            infoWindow.setContent(marker.title);
+            infoWindow.open(marker.map, marker);
+          });    
+
+
+
+        if (places.length === 0) {
+            calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints, time);
+        } 
+        else {
+            // console.log(places)
+            getMinDist(result[1], places, waypoints, time);
+        }
 
       if (places.length === 0) {
         calculateAndDisplayRoute(
@@ -182,7 +223,22 @@ function MapRoute() {
         waypts.push({ location: pt, stopover: true });
       }
 
-      directionsService
+
+
+    function calculateAndDisplayRoute(directionsService, directionsRenderer, pts, time) {
+
+      const waypts = [];
+      for (const pt of pts) {
+    
+
+          waypts.push({location: pt, stopover: true})
+
+        }
+        
+
+
+
+        directionsService
         .route({
           origin: new google.maps.LatLng(origin.lat, origin.lng),
           destination: new google.maps.LatLng(origin.lat, origin.lng),
@@ -429,14 +485,14 @@ function Ingredients({
           </div>
         </div>
         <div className="flex flex-col items-center">
-          <h2 className="text-2xl font-bold text-center">Ingredients</h2>
+          <h2 className="text-2xl font-bold text-center">Grocery Items</h2>
           <div className="mb-4">
             <div className="flex items-center">
               <input
                 className="shadow appearance-none border rounded w-fit py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
                 id="ingredient"
                 type="text"
-                placeholder="Enter your ingredient!"
+                placeholder="Enter your items!"
                 value={ingredient}
                 onChange={handleIngredientChange}
                 onKeyUp={handleEnter}
@@ -458,21 +514,19 @@ function Ingredients({
                     >
                       <div className="flex-grow space-x-3">
                         <span>{item}</span>
-                        <span>Quantity: {quantities[index]}</span>
+                        <span className="font-bold">Quantity: {quantities[index]}</span>
                       </div>
-                      <div className="flex items-center">
-                        <img
-                          src={chevronUp}
-                          alt="Up"
-                          className="h-5 w-5 ml-2 cursor-pointer"
-                          onClick={() => handleQuantityUp(index)}
-                        />
-                        <img
-                          src={chevronDown}
-                          alt="Down"
-                          className="h-5 w-5 ml-2 cursor-pointer"
-                          onClick={() => handleQuantityDown(index)}
-                        />
+                      <div className="flex items-center space-x-3">
+                      <div className="caret" onClick={()=>{handleQuantityUp(index)}}>
+                        <svg class="w-6 h-6 text-black dark:text-white hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 8">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7 7.674 1.3a.91.91 0 0 0-1.348 0L1 7"/>
+                        </svg>
+                      </div>
+                      <div className="caret" onClick={()=>{handleQuantityDown(index)}}>
+                        <svg class="w-6 h-6 text-black dark:text-white hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 8" >
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 5.326 5.7a.909.909 0 0 0 1.348 0L13 1"/>
+                        </svg>
+                      </div>
                       </div>
                     </div>
                   </li>
@@ -537,11 +591,11 @@ function Another({
     //call filter endpoint whenever StoresSelected changes
   };
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(0)}
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="bg-cambridge-blue rounded-full py-2 px-4 text-white font-bold"
         >
           Back
         </button>
@@ -559,7 +613,7 @@ function Another({
         </button>
       </div>
       <div className="space-y-8 flex-grow">
-        <h1 className="text-4xl font-bold">
+        <h1 className="text-4xl font-bold text-raisin-black">
           Let{"'"}s figure out your grocery run!
         </h1>
         <div className="flex flex-col space-y-4">
@@ -569,8 +623,8 @@ function Another({
                 <div
                   key={index}
                   onClick={() => handleStoreSelect(store)}
-                  className={`cursor-pointer p-2 border rounded ${
-                    storesSelected.includes(store) ? "bg-green-500" : "bg-white"
+                  className={`cursor-pointer p-2 rounded ${
+                    storesSelected.includes(store) ? "bg-jungle-green" : "bg-hover-dgreen text-white"
                   }`}
                 >
                   {store}
