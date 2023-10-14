@@ -124,7 +124,7 @@ function Ingredients({
   };
 
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-end">
         <button
           onClick={() => setScreenId(1)}
@@ -139,6 +139,19 @@ function Ingredients({
           <p className="text-center">
             Start by adding the ingredients you want to buy
           </p>
+            <div className="flex justify-center items-center">
+              <div className="block max-w-md p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 justify-center items-center">
+                <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
+                <ol className="list-decimal list-outside">
+                  <li>You enter the recipe that you want</li>
+                  <li>
+                    We find the best deals from local stores to fulfill your
+                    recipe
+                  </li>
+                  <li>You save time and money for that next meal!</li>
+                </ol>
+              </div>
+            </div>
         </div>
         <div>
           <h2 className="text-2xl font-bold text-center">Ingredients</h2>
@@ -202,41 +215,41 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId }) {
   };
   return (
     <>
-      <section className="w-screen">
-        <button onClick={() => setScreenId(0)}>Back</button>
-
-        <h1 className="text-4xl font-bold mb-6">Grocery Run</h1>
-        <div className="flex flex-col space-y-4">
-          <div className="flex flex-col space-y-3">
-            <h2 className="text-2xl font-bold">
-              Let{"'"}s figure out your grocery run!
-            </h2>
-            <div className="grid grid-cols-4 gap-4">
-              {stores.map((store, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleStoreSelect(store)}
-                  className={`cursor-pointer p-2 border rounded ${
-                    storesSelected.includes(store) ? "bg-green-500" : "bg-white"
-                  }`}
-                >
-                  {store}
-                </div>
-              ))}
-            </div>
-            <StoreSuggestions selectedStores={storesSelected} />
-          </div>
-          <div className="flex justify-center items-center">
-            <div className="block max-w-md p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 justify-center items-center">
-              <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
-              <ol className="list-decimal list-outside">
-                <li>You enter the recipe that you want</li>
-                <li>
-                  We find the best deals from local stores to fulfill your
-                  recipe
-                </li>
-                <li>You save time and money for that next meal!</li>
-              </ol>
+      <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+        <div className="flex justify-between">
+          <button
+            onClick={() => setScreenId(0)}
+            className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          >
+            Back
+          </button>
+          <button
+            onClick={() => setScreenId(2)}
+            className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          >
+            Next
+          </button>
+        </div>
+        <div className="space-y-8 flex-grow">
+          <h1 className="text-4xl font-bold">Let{"'"}s figure out your grocery run!</h1>
+          <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-3">
+              <div className="grid grid-cols-4 gap-4">
+                {stores.map((store, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleStoreSelect(store)}
+                    className={`cursor-pointer p-2 border rounded ${
+                      storesSelected.includes(store)
+                        ? "bg-green-500"
+                        : "bg-white"
+                    }`}
+                  >
+                    {store}
+                  </div>
+                ))}
+              </div>
+              <StoreSuggestions selectedStores={storesSelected} />
             </div>
           </div>
         </div>
