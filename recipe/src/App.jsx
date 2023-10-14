@@ -752,7 +752,7 @@ export function GetYourStuff({ setScreenId }) {
           const { txid } = body;
           setPaybiltData(body.message);
           // poll for updates from Paybilt
-          const timeout = setTimeout(async () => {
+          const interval = setInterval(async () => {
             const res = await fetch(
               `http://127.0.0.1:8080/paybilt/status/${txid}`
             );
@@ -760,9 +760,9 @@ export function GetYourStuff({ setScreenId }) {
             console.log(body);
             if (body.status === "approved") {
               setApproved(true);
-              clearTimeout(timeout);
+              clearInterval(interval);
             }
-          }, 5000);
+          }, 1000);
         }}
       >
         <label>
