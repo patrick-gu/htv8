@@ -1,6 +1,5 @@
 import { useState } from "react";
 import axios from 'axios';
-import bin from "./assets/bin.png";
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
 function StoreSuggestions({ selectedStores }) {
@@ -223,18 +222,14 @@ function Ingredients({
                       className="flex p-4 bg-blue-500 w-full rounded-md cursor-pointer"
                       key={index}
                     >
-                      <span>{item}</span>
-                      <span>Quantity:{quantities[index]}</span>
-                      <span>FreshCo, Bulk, $2.31/lb</span>
-                      <span>$4.50</span>
-                      <img src={chevronUp} alt="Up" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityUp(index)} />
-                      <img src={chevronDown} alt="Down" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityDown(index)} />
-                      <img
-                        src={bin}
-                        alt="Remove"
-                        className="h-5 w-5 ml-2 cursor-pointer"
-                        onClick={() => handleRemoveIngredient(index)}
-                      />
+                      <div className="flex-grow space-x-3">
+                        <span>{item}</span>
+                        <span>Quantity: {quantities[index]}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <img src={chevronUp} alt="Up" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityUp(index)} />
+                        <img src={chevronDown} alt="Down" className="h-5 w-5 ml-2 cursor-pointer" onClick={()=>handleQuantityDown(index)} />
+                      </div>
                     </div>
                   </li>
                 ))}
