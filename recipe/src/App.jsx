@@ -289,6 +289,7 @@ export function GetYourStuff({ setScreenId }) {
   const [nonce] = useState(() => Math.random().toString());
   const [paybiltData, setPaybiltData] = useState(null);
   const [isOrdering, setIsOrdering] = useState(false);
+  const [approved, setApproved] = useState(false);
   return (
     <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-between">
@@ -346,7 +347,18 @@ export function GetYourStuff({ setScreenId }) {
               });
               const body = await res.json();
               console.log(body);
+              const {txid} = body;
               setPaybiltData(body.message);
+              // poll for updates from Paybilt
+              setTimeout(async () => {
+                const res = await fetch(
+                  `http://127.0.0.1:8080/paybilt/status/${txid}`,
+                );
+                const body = await res.json();
+                if (body.status === "approved") {
+                  setApproved(true);
+                }
+              }, 5000);
             }}
           >
             <label>
@@ -437,15 +449,21 @@ export function GetYourStuff({ setScreenId }) {
             </button>
           </form>
         )}
-        {paybiltData !== null && (
-          <>
-            <h2 className="text-2xl font-bold">
-              Thanks for shopping! Please complete your transaction with
-              Paybilt.
-            </h2>
-            <div dangerouslySetInnerHTML={{ __html: paybiltData }}></div>
-          </>
-        )}
+        {paybiltData !== null &&
+          (approved ? (
+            <>
+              <h2 className="text-2xl font-bold">
+                Payment complete! Thanks for shopping.
+              </h2>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold">
+                Please complete your transaction with Paybilt.
+              </h2>
+              <div dangerouslySetInnerHTML={{ __html: paybiltData }}></div>
+            </>
+          ))}
       </div>
     </section>
   );
