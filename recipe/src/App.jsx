@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from 'axios';
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
+import food from "./assets/foods.jpg"
 function StoreSuggestions({ selectedStores }) {
   // For now, let's assume it's a simple array of suggestions
   const suggestions = [
@@ -176,8 +177,8 @@ function Ingredients({
           Next
         </button>
       </div>
-      <div className="grid grid-cols-1 gap-8 space-y-8 md:grid-cols-2 flex-grow">
-        <div className="flex flex-col gap-4 justify-center h-full">
+      <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
+        <div className="flex flex-col gap-8 justify-center h-[20rem]" >
           <h1 className="text-4xl font-bold text-center">Grocery Run</h1>
           <p className="text-center">
             Start by adding the ingredients you want to buy
@@ -196,25 +197,27 @@ function Ingredients({
             </div>
           </div>
         </div>
-        <div>
+        <div className="flex flex-col items-center">
           <h2 className="text-2xl font-bold text-center">Ingredients</h2>
           <div className="mb-4">
-            <input
-              className="shadow appearance-none border rounded w-2/6 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
-              id="ingredient"
-              type="text"
-              placeholder="Enter your ingredient!"
-              value={ingredient}
-              onChange={handleIngredientChange}
-              onKeyUp={handleEnter}
-            ></input>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-              onClick={handleAddIngredient}
-            >
-              Enter
-            </button>
-            <div className="ingredients">
+            <div className="flex items-center">
+              <input
+                className="shadow appearance-none border rounded w-fit py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
+                id="ingredient"
+                type="text"
+                placeholder="Enter your ingredient!"
+                value={ingredient}
+                onChange={handleIngredientChange}
+                onKeyUp={handleEnter}
+              ></input>
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                onClick={handleAddIngredient}
+              >
+                Enter
+              </button>
+            </div>
+            <div className="ingredients mt-4 h-[20rem] overflow-y-scroll">
               <ul className="flex flex-col">
                 {ingredientsList.map((item, index) => (
                   <li key={index} className="mr-4 mb-4">
