@@ -403,23 +403,23 @@ function Ingredients({
   };
 
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
       <div className="flex justify-end">
         <button
           onClick={firstPageNext}
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="bg-cambridge-blue rounded-full py-2 px-4 text-white font-bold text-raisin-black"
         >
           Next
         </button>
       </div>
       <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
         <div className="flex flex-col gap-8 justify-center h-[20rem]" >
-          <h1 className="text-4xl font-bold text-center">Grocery Run</h1>
+          <h1 className="text-4xl text-raisin-black font-bold text-center font-sans">Grocery Run</h1>
           <p className="text-center">
             Start by adding the ingredients you want to buy
           </p>
           <div className="flex justify-center items-center">
-            <div className="block max-w-md p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 justify-center items-center">
+            <div className="block max-w-md p-6 bg-coral-pink rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 justify-center items-center hover:animate-bounce">
               <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
               <ol className="list-decimal list-outside">
                 <li>You enter the recipe that you want</li>
@@ -446,7 +446,7 @@ function Ingredients({
                 onKeyUp={handleEnter}
               ></input>
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
                 onClick={handleAddIngredient}
               >
                 Enter
@@ -457,7 +457,7 @@ function Ingredients({
                 {ingredientsList.map((item, index) => (
                   <li key={index} className="mr-4 mb-4">
                     <div
-                      className="flex p-4 bg-blue-500 w-full rounded-md cursor-pointer"
+                      className="flex p-4 bg-jungle-green w-full rounded-md cursor-pointer"
                       key={index}
                     >
                       <div className="flex-grow space-x-3">
