@@ -87,6 +87,7 @@ function App() {
           setStoresSelected={setStoresSelected}
           setScreenId={setScreenId}
           ingredientsList={ingredientsList}
+          quantities={quantities}
         />
         <SuggestRecipes setScreenId={setScreenId} />
         <GetYourStuff setScreenId={setScreenId} />
@@ -246,7 +247,7 @@ function Ingredients({
   );
 }
 
-function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingredientsList }) {
+function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingredientsList, quantities}) {
   const handleStoreSelect = async(store) => {
     if (storesSelected.includes(store)) {
       // Store is already selected, remove it and change the background to white
