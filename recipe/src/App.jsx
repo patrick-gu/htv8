@@ -3,12 +3,28 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import food from './assets/foods.jpg';
 import bin from './assets/bin.png';
-import './App.css'
+import './App.css';
+
+function StoreSuggestions({ selectedStores }) {
+  // For now, let's assume it's a simple array of suggestions
+  const suggestions = ["Remove FreshCo from your run for $3.54 more to save 15 minutes on your run", "Add FoodBasics to your run to save $15.20 for 10 minutes on your run", "Don't eat to save 100% of the costs on this run"];
+
+  return (
+    <div className={`suggestions ${selectedStores.length > 0 ? 'block' : 'hidden'}`}>
+      <h2 className="text-2xl font-bold">Store Suggestions:</h2>
+      <div className="flex space-x-2">
+        {suggestions.map((suggestion, index) => (
+          <div className="bg-yellow-100 w-fit+1 h-fit+2 p-2"key={index}>{suggestion}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [ingredient, setIngredient] = useState(''); // State to capture the entered ingredient
   const [ingredientsList, setIngredientsList] = useState([]); // State to store the list of ingredients
-  const storesSelected = useState([]);
+  const [storesSelected, setStoresSelected] = useState([]);
   const stores = [
     "Walmart",
     "Metro",
@@ -39,7 +55,8 @@ function App() {
   ]; //possible stores 
 
   const handleStoreSelect = (store) =>{
-    storesSelected([...storesSelected, store])
+    setStoresSelected([...storesSelected, store]); //update the store state
+
   }
 
   //change of state when user types into the ingredients bar
@@ -83,6 +100,7 @@ function App() {
             )
             )}
           </div>
+          <StoreSuggestions selectedStores={storesSelected} />
         </div>
         <h2 class="text-2xl font-bold">Enter your ingredients below</h2>
         <div class="mb-4">
