@@ -20,6 +20,7 @@ app = FastAPI()
 class Sieve(BaseModel):
     storesList: list
     shoppingList: list
+    quantities: list
 
 
 origins = ["*"]
@@ -56,12 +57,13 @@ class Item:
 
 
 class FinalItem:
-    def __init__(self, name, store, price, img, unitprice):
+    def __init__(self, name, store, price, img, unitprice, quantity):
         self.name = name
         self.store = store
         self.price = price
         self.img = img
         self.unitprice = unitprice
+        self.quantity = quantity
 
 
 def levenshtein_distance(s, t):
@@ -99,14 +101,14 @@ def getStores():
     return list(data.keys())
 
 
-def searchDefaultItems(query):
+def searchDefaultItems(query, amount):
     f = open('defaultItems.json')
     data = json.load(f)
     choice = None
     for item in data:
         if compute_similarity(query.lower(), item['name'].lower()) > 0.6 or query.lower() in item['name'].lower():
             choice = FinalItem(item['name']+" "+item['desc'], None, item['price'], item['img'], str(
-                item['pricePerUnit'])+' / ' + str(item['unitQuantity']) + str(item['unit']))
+                item['pricePerUnit'])+' / ' + str(item['unitQuantity']) + str(item['unit']), amount)
             break
     return choice
 
@@ -193,6 +195,7 @@ async def flipp(sieve: Sieve):
                         categorizeByItem[shoppingListItem] = categorizeByItem[shoppingListItem]+[item]
     totalcost = 0
     bestShoppingList = {}
+    counter=0
     for key in categorizeByItem.keys():
         itemCost = 1e9
         item = None
@@ -205,14 +208,15 @@ async def flipp(sieve: Sieve):
                 0 == 0
         if (item != None):
             newItem = FinalItem(
-                item['name'], item['store'], item['price'], item['img'], None)
+                item['name'], item['store'], item['price'], item['img'], None,sieve.quantities[counter])
             bestShoppingList[key] = newItem
-            totalcost += float(item['price'])
+            totalcost += (float(item['price'])*sieve.quantities[counter])
         else:
-            defaultItem = searchDefaultItems(key)
+            defaultItem = searchDefaultItems(key,sieve.quantities[counter])
             if defaultItem != None:
                 bestShoppingList[key] = defaultItem
-                totalcost += float(defaultItem.price)
+                totalcost += (float(defaultItem.price)*defaultItem.quantity)
+        counter+=1
 
     return bestShoppingList, {"cost": str(round(totalcost, 2))}
 
