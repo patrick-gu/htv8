@@ -9,9 +9,12 @@ import cloudscraper
 import os
 
 with open("./.env") as env_file:
-    line = env_file.readline()
-    [key, value] = line.split("=")
-    os.environ[key] = value
+    s = env_file.read()
+    for l in s.split("\n"):
+        if len(l) == 0:
+            continue
+        [key, value] = l.split("=")
+        os.environ[key] = value
 PAYBILT_TOKEN = os.environ["PAYBILT_TOKEN"]
 
 app = FastAPI()
@@ -195,7 +198,7 @@ async def flipp(sieve: Sieve):
                         categorizeByItem[shoppingListItem] = categorizeByItem[shoppingListItem]+[item]
     totalcost = 0
     bestShoppingList = {}
-    counter=0
+    counter = 0
     for key in categorizeByItem.keys():
         itemCost = 1e9
         item = None
@@ -208,15 +211,15 @@ async def flipp(sieve: Sieve):
                 0 == 0
         if (item != None):
             newItem = FinalItem(
-                item['name'], item['store'], item['price'], item['img'], None,sieve.quantities[counter])
+                item['name'], item['store'], item['price'], item['img'], None, sieve.quantities[counter])
             bestShoppingList[key] = newItem
             totalcost += (float(item['price'])*sieve.quantities[counter])
         else:
-            defaultItem = searchDefaultItems(key,sieve.quantities[counter])
+            defaultItem = searchDefaultItems(key, sieve.quantities[counter])
             if defaultItem != None:
                 bestShoppingList[key] = defaultItem
                 totalcost += (float(defaultItem.price)*defaultItem.quantity)
-        counter+=1
+        counter += 1
 
     return bestShoppingList, {"cost": str(round(totalcost, 2))}
 
@@ -350,6 +353,32 @@ async def paybilt_status_proxy(txid: str):
     response = requests.request("GET", f"https://sandbox.pp.paybilt.com/api/v2/status/{txid}", headers={
         "Authorization": f"Bearer {PAYBILT_TOKEN}"})
     return response.json()
+
+
+@app.post('/recipe/suggest')
+async def recipe_suggestion(request: Request):
+    body = await request.json()
+
+    payload = {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a helpful assistant."
+            },
+            {
+                "role": "user",
+                "content": "Please generate a recipe with the following ingredients. You don't need to use all the ingredients. " + ",".join(body["ingredients"])
+            }
+        ]
+    }
+
+    OPENAI_TOKEN = os.environ["OPENAI_TOKEN"]
+    response = requests.request(
+        "POST", "https://api.openai.com/v1/chat/completions", json=payload, headers={"Authorization": f"Bearer {OPENAI_TOKEN}"})
+    json = response.json()
+    print(json)
+    return {"content": json["choices"][0]["message"]["content"]}
 
 
 if __name__ == "__main__":

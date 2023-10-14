@@ -44,6 +44,7 @@ function App() {
   const [storesSelected, setStoresSelected] = useState(["T&T Supermarket","No Frills","Walmart","FreshCo","Real Canadian Superstore","Sobeys","Metro","Food Basics","Loblaws","Costco"]);
   const [currentCost, setCurrentCost] = useState(0);
   const [currentItems,setCurrentItems] = useState([]);
+  const [recipe, setRecipe] = useState("");
   const stores = [
     "Walmart",
     "Metro",
@@ -80,6 +81,7 @@ function App() {
           storesSelected={storesSelected}
           quantities={quantities}
           setQuantity={setQuantity}
+          setRecipe={setRecipe}
         />
         <Another
           stores={stores}
@@ -89,7 +91,7 @@ function App() {
           ingredientsList={ingredientsList}
           quantities={quantities}
         />
-        <SuggestRecipes setScreenId={setScreenId} />
+        <SuggestRecipes setScreenId={setScreenId} recipe={recipe} />
         <GetYourStuff setScreenId={setScreenId} />
       </main>
     </div>
@@ -104,7 +106,8 @@ function Ingredients({
   setScreenId,
   storesSelected,
   quantities,
-  setQuantity
+  setQuantity,
+  setRecipe,
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
@@ -124,6 +127,17 @@ function Ingredients({
       console.log(error);
     });
     setScreenId(1);
+    fetch("http://127.0.0.1:8080/recipe/suggest", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ingredients: ingredientsList })
+    }).then(async (response) => {
+        const { content } = await response.json();
+        console.log(content);
+        setRecipe(content);
+    })
   };
 
   //append ingredient to list
@@ -326,7 +340,7 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId,ingred
   );
 }
 
-export function SuggestRecipes({ setScreenId }) {
+export function SuggestRecipes({ setScreenId, recipe }) {
   return (
     <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-between">
@@ -345,6 +359,8 @@ export function SuggestRecipes({ setScreenId }) {
       </div>
       <div className="space-y-8 flex-grow">
         <h1 className="text-4xl font-bold">What are you cooking?</h1>
+        <h2 className="text-xl">Here&apos;s a recipe suggestion:</h2>
+        <p className="whitespace-pre-line">{recipe.length !== 0 ? recipe : "Loading a recipe..."}</p>
       </div>
     </section>
   );
