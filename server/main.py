@@ -341,5 +341,12 @@ async def payment_paybilt(request: Request):
     return response.json()
 
 
+@app.get('/paybilt/status/{txid}')
+async def paybilt_status_proxy(txid: str):
+    response = requests.request("GET", f"https://sandbox.pp.paybilt.com/api/v2/status/{txid}", headers={
+        "Authorization": f"Bearer {PAYBILT_TOKEN}"})
+    return response.json()
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8080, log_level="info")
