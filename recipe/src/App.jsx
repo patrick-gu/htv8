@@ -62,14 +62,14 @@ function App() {
 
   const [screenId, setScreenId] = useState(0);
 
-  const translate = ["", "translate-x-[-100vw]", "translate-x-[-200vw]"][
+  const translate = ["", "translate-x-[-100vw]", "translate-x-[-200vw]", "translate-x-[-300vw]"][
     screenId
   ];
 
   return (
     <div className="w-full overflow-hidden h-full">
       <main
-        className={`w-[300vw] ${translate} transition-transform h-full flex flex-row`}
+        className={`w-[400vw] ${translate} transition-transform h-full flex flex-row`}
       >
         <Ingredients
           ingredient={ingredient}
@@ -84,6 +84,8 @@ function App() {
           setStoresSelected={setStoresSelected}
           setScreenId={setScreenId}
         />
+        <SuggestRecipes setScreenId={setScreenId} />
+        <GetYourStuff setScreenId={setScreenId} />
       </main>
     </div>
   );
@@ -214,7 +216,6 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId }) {
     }
   };
   return (
-    <>
       <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
         <div className="flex justify-between">
           <button
@@ -254,8 +255,49 @@ function Another({ stores, storesSelected, setStoresSelected, setScreenId }) {
           </div>
         </div>
       </section>
-    </>
   );
+}
+
+export function SuggestRecipes({ setScreenId }) {
+    return (
+        <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+        <div className="flex justify-between">
+          <button
+            onClick={() => setScreenId(1)}
+            className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          >
+            Back
+          </button>
+          <button
+            onClick={() => setScreenId(3)}
+            className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          >
+            Next
+          </button>
+        </div>
+        <div className="space-y-8 flex-grow">
+          <h1 className="text-4xl font-bold">What are you cooking?</h1>
+        </div>
+      </section>
+    )
+}
+
+export function GetYourStuff({ setScreenId }) {
+    return (
+        <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+        <div className="flex justify-between">
+          <button
+            onClick={() => setScreenId(2)}
+            className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          >
+            Back
+          </button>
+        </div>
+        <div className="space-y-8 flex-grow">
+          <h1 className="text-4xl font-bold">Get your stuff</h1>
+        </div>
+      </section>
+    )
 }
 
 export default App;
