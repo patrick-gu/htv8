@@ -517,7 +517,7 @@ function Ingredients({
                         <span>{item}</span>
                         <span className="font-bold">Quantity: {quantities[index]}</span>
                       </div>
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-3 ml-4">
                       <div className="caret" onClick={()=>{handleQuantityUp(index)}}>
                         <svg class="w-6 h-6 text-black dark:text-white hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 8">
                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7 7.674 1.3a.91.91 0 0 0-1.348 0L1 7"/>
@@ -551,6 +551,20 @@ function Another({
   currentList,
   setCurrentList,
 }) {
+  const [postalCode, setPostalCode] = useState(""); // State to store the postal code
+
+  // Function to handle changes in the postal code input field
+  const handlePostalCodeChange = (e) => {
+    setPostalCode(e.target.value);
+  };
+
+  // Function to add the entered postal code to the state
+  const handleAddPostalCode = () => {
+    if (postalCode.trim() !== "") {
+      setPostalCode(""); // Clear the input field after use
+    }
+  };
+
   const handleStoreSelect = async (store) => {
     if (storesSelected.includes(store)) {
       // Store is already selected, remove it and change the background to white
@@ -617,6 +631,23 @@ function Another({
         <h1 className="text-4xl font-bold text-raisin-black">
           Let{"'"}s figure out your grocery run!
         </h1>
+        {/* Postal Code input field */}
+        <div className="flex items-center">
+          <input
+            className="shadow appearance-none border rounded w-fit py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
+            id="postalCode"
+            type="text"
+            placeholder="Enter postal code"
+            value={postalCode}
+            onChange={handlePostalCodeChange}
+          ></input>
+          <button
+            className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
+            onClick={handleAddPostalCode}
+          >
+            Add Postal Code
+          </button>
+        </div>
         <div className="flex flex-col space-y-4">
           <div className="flex flex-col space-y-3">
             <div className="grid grid-cols-4 gap-4">
@@ -625,7 +656,7 @@ function Another({
                   key={index}
                   onClick={() => handleStoreSelect(store)}
                   className={`cursor-pointer p-2 rounded ${
-                    storesSelected.includes(store) ? "bg-jungle-green" : "bg-hover-dgreen text-white"
+                    storesSelected.includes(store) ? "bg-jungle-green" : "bg-cambridge-blue line-through"
                   }`}
                 >
                   {store}
