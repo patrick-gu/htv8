@@ -286,8 +286,9 @@ export function SuggestRecipes({ setScreenId }) {
 }
 
 export function GetYourStuff({ setScreenId }) {
-    const [nonce] = useState(() => Math.random().toString());
-    const [paybiltData, setPaybiltData] = useState(null);
+  const [nonce] = useState(() => Math.random().toString());
+  const [paybiltData, setPaybiltData] = useState(null);
+  const [isOrdering, setIsOrdering] = useState(false);
   return (
     <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-between">
@@ -298,135 +299,153 @@ export function GetYourStuff({ setScreenId }) {
           Back
         </button>
       </div>
-      <div
-        className="space-y-8 flex-grow"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          const form = e.target;
-          const formData = new FormData(form);
-          const dict = {};
-          for (const [key, value] of formData) {
-            dict[key] = value;
-          }
-          dict.items = [
-            {
-                "name": "tomato",
-                "quantity": 1,
-                "description": "just a tomato",
-                "unit_price": 2
-			}
-          ];
-          dict.nonce = nonce;
-          console.log(dict);
-          const res = await fetch("http://127.0.0.1:8080/paybilt", {
-            method: "POST",
-            body: JSON.stringify(dict),
-            headers: {
-                "Content-Type": "application/json"
-            }
-          });
-          const body = await res.json();
-          console.log(body);
-          setPaybiltData(body.message);
-        }}
-      >
+      <div className="space-y-8 flex-grow">
         <h1 className="text-4xl font-bold">Get your stuff</h1>
-        <form>
-          <label>
-            Email
-            <input type="email" name="email" className="border" />
-          </label>
-
-          <label>
-            Phone{" "}
-            <input
-              type="phone"
-              name="phone"
-              defaultValue="0000000000"
-              className="border p-2 rounded"
-            />
-          </label>
-
-          <label>
-            First Name{" "}
-            <input
-              type="text"
-              name="first_name"
-              defaultValue="King"
-              className="border"
-            />
-          </label>
-
-          <label>
-            Last Name
-            <input
-              type="text"
-              name="last_name"
-              defaultValue="Warrior"
-              className="border"
-            />
-          </label>
-
-          <label>
-            Address
-            <input
-              type="text"
-              name="address"
-              defaultValue="200 University Ave W"
-              className="border"
-            />
-          </label>
-
-          <label>
-            City
-            <input
-              type="text"
-              name="city"
-              defaultValue="Waterloo"
-              className="border"
-            />
-          </label>
-          <label>
-            Province (State)
-            <input
-              type="text"
-              name="state"
-              defaultValue="Ontario"
-              className="border"
-            />
-          </label>
-          <label>
-            Country{" "}
-            <select name="country" className="border">
-              <option defaultValue="CA">Canada</option>
-            </select>
-          </label>
-
-          <label>
-            Postal Code (Zip Code){" "}
-            <input
-              type="text"
-              name="zip_code"
-              defaultValue="N2L 3G1"
-              className="border"
-            />
-          </label>
-
-          <button
-            type="submit"
-            className="bg-blue-500 rounded-full py-2 px-4 text-white"
+        <button
+          className={`p-2 rounded-full ${
+            !isOrdering ? "bg-blue-500" : "bg-blue-100"
+          }`}
+          onClick={() => setIsOrdering(false)}
+        >
+          I&apos;ll get it myself
+        </button>
+        <button
+          className={`p-2 rounded-full ${
+            isOrdering ? "bg-blue-500" : "bg-blue-100"
+          }`}
+          onClick={() => setIsOrdering(true)}
+        >
+          Order it (Paybilt integration)
+        </button>
+        {isOrdering && (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const form = e.target;
+              const formData = new FormData(form);
+              const dict = {};
+              for (const [key, value] of formData) {
+                dict[key] = value;
+              }
+              dict.items = [
+                {
+                  name: "tomato",
+                  quantity: 1,
+                  description: "just a tomato",
+                  unit_price: 2,
+                },
+              ];
+              dict.nonce = nonce;
+              console.log(dict);
+              const res = await fetch("http://127.0.0.1:8080/paybilt", {
+                method: "POST",
+                body: JSON.stringify(dict),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+              const body = await res.json();
+              console.log(body);
+              setPaybiltData(body.message);
+            }}
           >
-            Pay with Paybilt
-          </button>
-        </form>
-        {
-            paybiltData !== null && (
-                <>
-        <h2 className="text-2xl font-bold">Thanks for shopping! Please complete your transaction with Paybilt.</h2>
-                <div dangerouslySetInnerHTML={{__html: paybiltData}}></div>
-                </>
-            )
-        }
+            <label>
+              Email
+              <input type="email" name="email" className="border" />
+            </label>
+
+            <label>
+              Phone{" "}
+              <input
+                type="phone"
+                name="phone"
+                defaultValue="0000000000"
+                className="border p-2 rounded"
+              />
+            </label>
+
+            <label>
+              First Name{" "}
+              <input
+                type="text"
+                name="first_name"
+                defaultValue="King"
+                className="border"
+              />
+            </label>
+
+            <label>
+              Last Name
+              <input
+                type="text"
+                name="last_name"
+                defaultValue="Warrior"
+                className="border"
+              />
+            </label>
+
+            <label>
+              Address
+              <input
+                type="text"
+                name="address"
+                defaultValue="200 University Ave W"
+                className="border"
+              />
+            </label>
+
+            <label>
+              City
+              <input
+                type="text"
+                name="city"
+                defaultValue="Waterloo"
+                className="border"
+              />
+            </label>
+            <label>
+              Province (State)
+              <input
+                type="text"
+                name="state"
+                defaultValue="Ontario"
+                className="border"
+              />
+            </label>
+            <label>
+              Country{" "}
+              <select name="country" className="border">
+                <option defaultValue="CA">Canada</option>
+              </select>
+            </label>
+
+            <label>
+              Postal Code (Zip Code){" "}
+              <input
+                type="text"
+                name="zip_code"
+                defaultValue="N2L 3G1"
+                className="border"
+              />
+            </label>
+
+            <button
+              type="submit"
+              className="bg-blue-500 rounded-full py-2 px-4 text-white"
+            >
+              Pay with Paybilt
+            </button>
+          </form>
+        )}
+        {paybiltData !== null && (
+          <>
+            <h2 className="text-2xl font-bold">
+              Thanks for shopping! Please complete your transaction with
+              Paybilt.
+            </h2>
+            <div dangerouslySetInnerHTML={{ __html: paybiltData }}></div>
+          </>
+        )}
       </div>
     </section>
   );
