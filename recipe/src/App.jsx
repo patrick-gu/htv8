@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from 'axios';
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
@@ -12,7 +12,7 @@ function InitMapRoute() {
 
 
 
-function MapRoute() {
+function MapRoute(initSuggestions) {
   async function initMap() {
     let origin = { lat: 43.7867303, lng: -79.1920265 };
    
@@ -278,7 +278,7 @@ function MapRoute() {
     
       
 }
-  initMap();  
+  initMap().then(initSuggestions);  
 }
 
 
@@ -636,7 +636,7 @@ async function getMinDistNoDisplay(start, places, waypoints, time) {
 
 
 
-function StoreSuggestions({ selectedStores, suggestions }) {
+function StoreSuggestions({ selectedStores, setSelectedStores, suggestions }) {
   // For now, let's assume it's a simple array of suggestions
 //   const suggestions = [
 //     "Remove FreshCo from your run for $3.54 more to save 15 minutes on your run",
@@ -661,9 +661,11 @@ function StoreSuggestions({ selectedStores, suggestions }) {
     >
       <div className="flex space-x-2 overflow-y-hidden overflow-x-scroll w-screen h-auto">
         {suggestions.map((suggestion, index) => (
-          <div className="bg-yellow-100 p-2 rounded-lg" key={index} style={{height:"5vw",width:"100vw"}}>
+          <button className="bg-yellow-100 p-2 rounded-lg" key={index} style={{height:"5vw",width:"100vw"}} onClick={() => {
+            setSelectedStores(selectedStores.toSpliced(selectedStores.indexOf(suggestion.store), 1));
+          }}>
             <p>{suggestion.text}</p>
-          </div>
+          </button>
         ))}
       </div>
     </div>
@@ -707,6 +709,8 @@ function App() {
     "translate-x-[-300vw]",
   ][screenId];
 
+  const [suggestions, setSuggestions] = useState([]);
+
   return (
     <div className="w-full overflow-hidden h-full">
       <main
@@ -724,6 +728,7 @@ function App() {
           setRecipe={setRecipe}
           currentList={currentList}
           setCurrentList={setCurrentList}
+          setSuggestions={setSuggestions}
         />
         <Another
           stores={stores}
@@ -734,6 +739,8 @@ function App() {
           quantities={quantities}
           currentList={currentList}
           setCurrentList={setCurrentList}
+          suggestions={suggestions}
+          setSuggestions={setSuggestions}
         />
         <GetYourStuff setScreenId={setScreenId} />
         <SuggestRecipes setScreenId={setScreenId} recipe={recipe} />
@@ -754,7 +761,8 @@ function Ingredients({
   setQuantity,
   setRecipe,
   currentList,
-  setCurrentList
+  setCurrentList,
+  setSuggestions,
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
@@ -772,7 +780,7 @@ function Ingredients({
       .then(function (response) {
         setCurrentList(response.data[0]);
         console.log(response.data[0]);
-        MapRoute();
+        MapRoute(() => findSuggestions({ postalCode: "", storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s)));
       })
       .catch(function (error) {
         console.log(error);
@@ -1023,7 +1031,7 @@ async function findSuggestions({ postalCode, storesSelected, ingredientsList, qu
             continue;
         }
         const s = `Save ${-distDiff} minutes for $${priceDiff.toFixed(2)} more by skipping ${store}`;
-        ans.push({ text: s, id: 0 });
+        ans.push({ text: s, store });
     }
     console.log("ans");
     console.log(ans);
@@ -1038,12 +1046,12 @@ function Another({
   ingredientsList, 
   quantities, 
   currentList, 
-  setCurrentList
+  setCurrentList,
+  suggestions,
+  setSuggestions,
 }) {
 
   const [postalCode, setPostalCode] = useState(""); // State to store the postal code
-
-  const [suggestions, setSuggestions] = useState([]);
 
   // Function to handle changes in the postal code input field
   const handlePostalCodeChange = (e) => {
@@ -1151,7 +1159,7 @@ function Another({
                 </div>
               ))}
             </div>
-            <StoreSuggestions selectedStores={storesSelected} suggestions={suggestions} />
+            <StoreSuggestions selectedStores={storesSelected} setSelectedStores={setStoresSelected} suggestions={suggestions} />
             <InitMapRoute />
             <div>
               <div className="grid grid-cols-3" id="resultsList">
