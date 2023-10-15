@@ -910,7 +910,7 @@ function Ingredients({
                   We find the best deals from local stores and give you travel paths, the projected time you'll spend shopping, and the cost.
                 </li>
                 <li className="my-2">
-                  If you don't want to drive, checkout with Paybilt Instant Interact E-transfer.
+                  If you don't want to drive, checkout with Paybilt Instant Interac E-transfer.
                 </li>
                 <li className="my-2">
                   As a bonus, find recipes you can make with your ingredients.
