@@ -920,13 +920,17 @@ function Another({
   };
 
   const handleStoreSelect = async(store) => {
+    let newStoresSelected;
     if (storesSelected.includes(store)) {
       // Store is already selected, remove it and change the background to white
-      const newStoresSelected=storesSelected.filter((selectedStore) => selectedStore !== store);
-      setStoresSelected(
-        newStoresSelected
-      );
-
+      newStoresSelected=storesSelected.filter((selectedStore) => selectedStore !== store);
+    }
+    else {
+      // Store is not selected, add it and change the background to green
+      newStoresSelected = [...storesSelected, store];
+    }
+    setStoresSelected(newStoresSelected);
+    
       await axios.post('http://127.0.0.1:8080/filter', {
         storesList: newStoresSelected,
         shoppingList: ingredientsList,
@@ -940,27 +944,6 @@ function Another({
         .catch(function (error) {
           console.log(error);
         });
-    }
-    else {
-      // Store is not selected, add it and change the background to green
-      
-      setStoresSelected([...storesSelected, store]);
-      const newStoresSelected = [...storesSelected, store];
-
-      await axios.post('http://127.0.0.1:8080/filter', {
-        storesList: [...storesSelected, store],
-        shoppingList: ingredientsList,
-        quantities: quantities
-        })
-        .then(function (response) {
-          setCurrentList(response.data[0]);
-          console.log(response.data[0])
-          UpdateMapRoute(newStoresSelected, postalCode);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
     //call filter endpoint whenever StoresSelected changes
   }
   return (
