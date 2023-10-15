@@ -269,6 +269,8 @@ function MapRoute(initSuggestions) {
             directionsRenderer.setDirections(response);
             console.log(time);
             // time = total trip time
+            let timeElement = document.getElementsByClassName("text-2xl font-bold text-center mb-3")[0];
+            timeElement.textContent =  `${time} minutes of travel time! 🥳`;
         })
 
     }
@@ -566,6 +568,8 @@ function UpdateMapRoute(storesSelected, postalCode) {
           console.log(response);
           console.log(time);
           // time = total trip time
+          let timeElement = document.getElementsByClassName("text-2xl font-bold text-center mb-3")[0];
+          timeElement.textContent =  `${time} minutes of travel time! 🥳`;
       })
 
     }
@@ -648,7 +652,7 @@ function StoreSuggestions({ selectedStores, setSelectedStores, suggestions }) {
 
   return (
     <div>
-    <h2 className="text-2xl font-bold">Store Suggestions:</h2>
+    <h2 className="text-2xl font-bold text-center mb-3">Store Suggestions:</h2>
     <div
       className={`suggestions ${
         selectedStores.length > 0 ? "block" : "hidden "
@@ -895,7 +899,7 @@ function Ingredients({
           </h1>
           </div>
           <p className="text-center text-2xl">
-            Start by adding the ingredients you want to buy
+            Start by adding the items you want to buy 😎
           </p>
           <div className="flex justify-center items-center">
             <div className=" font-custom block w-fit p-6 bg-whitesmoke rounded-lg drop-shadow dark:border-gray-700 justify-center items-center hover:animate-bounce">
@@ -917,14 +921,14 @@ function Ingredients({
           </div>
         </div>
         <div className="flex flex-col items-center">
-          <h2 className="text-3xl font-bold text-center my-1.5">Grocery Items</h2>
+          <h2 className="text-3xl font-bold text-center my-1.5">Grocery Items 😋</h2>
           <div className="mb-4">
             <div className="flex items-center">
               <input
                 className="shadow appearance-none border rounded w-fit py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
                 id="ingredient"
                 type="text"
-                placeholder="Enter your ingredient!"
+                placeholder="Enter your items!"
                 value={ingredient}
                 onChange={handleIngredientChange}
                 onKeyUp={handleEnter}
@@ -950,12 +954,12 @@ function Ingredients({
                       </div>
                       <div className="flex items-center space-x-3 ml-4">
                       <div className="caret" onClick={()=>{handleQuantityUp(index)}}>
-                        <svg class="w-6 h-6 text-black dark:text-white hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 8">
+                        <svg class="w-6 h-6 text-black hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 8">
                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7 7.674 1.3a.91.91 0 0 0-1.348 0L1 7"/>
                         </svg>
                       </div>
                       <div className="caret" onClick={()=>{handleQuantityDown(index)}}>
-                        <svg class="w-6 h-6 text-black dark:text-white hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 8" >
+                        <svg class="w-6 h-6 text-black hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 8" >
                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 5.326 5.7a.909.909 0 0 0 1.348 0L13 1"/>
                         </svg>
                       </div>
@@ -1170,7 +1174,7 @@ function Another({
       </div>
       <div className="space-y-8 flex-grow">
         <h1 className="text-4xl font-bold text-raisin-black">
-          Let{"'"}s figure out your grocery run!
+          Let{"'"}s figure out your grocery run! 🤩
         </h1>
         {/* Postal Code input field */}
         <div className="flex items-center">
@@ -1243,8 +1247,8 @@ export function SuggestRecipes({ setScreenId, recipe }) {
         </button> */}
       </div>
       <div className="space-y-8 flex-grow">
-        <h1 className="text-4xl font-bold">Need help with meal prep?</h1>
-        <h2 className="text-xl">Here&apos;s a recipe suggestion:</h2>
+        <h1 className="text-4xl font-bold">Need help with meal prep? 🤔</h1>
+        <h2 className="text-xl">Here&apos;s a recipe suggestion! 😍</h2>
         <p className="whitespace-pre-line">
           {recipe.length !== 0 ? recipe : "Loading a recipe..."}
         </p>
@@ -1312,7 +1316,7 @@ export function GetYourStuff({ setScreenId }) {
         }}
       >
       <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white drop-shadow">
-        <h1 className="text-4xl font-bold">Complete Your Payment</h1>
+        <h1 className="text-4xl font-bold">Complete Your Payment 💵</h1>
         {approved ?(<img src={checkMark} />):(
         <div>  
         <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
@@ -1400,7 +1404,7 @@ export function GetYourStuff({ setScreenId }) {
           className="relative group bg-hover-dgreen rounded-full py-2 px-4 text-white overflow-hidden"
         >
           <div class="absolute inset-0 w-0 bg-cambridge-blue transition-all duration-[250ms] ease-out group-hover:w-full"></div>
-          <span class="relative text-white group-hover:text-black justify-center">Pay with Paybilt 💵</span>
+          <span class="relative text-white group-hover:text-black justify-center">Pay with Paybilt </span>
         </button>
         </label>
         </div>
