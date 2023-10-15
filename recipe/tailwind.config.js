@@ -17,7 +17,8 @@ export default {
         'whitesmoke': '#f5f5f5'
       },
       animation: {
-        'bounce': 'bounce 2.5s'
+        'bounce': 'bounce 2.5s',
+        'text': 'text 5s ease infinite'
       },
       keyframes: {
         bounce: {
@@ -29,7 +30,17 @@ export default {
             transform: 'translateY(0)',
             animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)'
           },
-        }
+        },
+        text: {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center',
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center',
+          },
+        },
       },
       fontFamily: {
         'header': ['Helvetica Neue'],
