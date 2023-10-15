@@ -730,6 +730,8 @@ function App() {
           currentList={currentList}
           setCurrentList={setCurrentList}
           setSuggestions={setSuggestions}
+          currentCost={currentCost}
+          setCurrentCost={setCurrentCost}
         />
         <Another
           stores={stores}
@@ -742,6 +744,8 @@ function App() {
           setCurrentList={setCurrentList}
           suggestions={suggestions}
           setSuggestions={setSuggestions}
+          currentCost={currentCost}
+          setCurrentCost={setCurrentCost}
         />
         <GetYourStuff setScreenId={setScreenId} />
         <SuggestRecipes setScreenId={setScreenId} recipe={recipe} />
@@ -764,6 +768,8 @@ function Ingredients({
   currentList,
   setCurrentList,
   setSuggestions,
+  currentCost,
+  setCurrentCost,
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
@@ -781,6 +787,7 @@ function Ingredients({
       .then(function (response) {
         setCurrentList(response.data[0]);
         console.log(response.data[0]);
+        setCurrentCost(response.data[1].cost);
         MapRoute(() => findSuggestions({ postalCode: "", storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s)));
       })
       .catch(function (error) {
@@ -1055,6 +1062,8 @@ function Another({
   setCurrentList,
   suggestions,
   setSuggestions,
+  currentCost,
+  setCurrentCost
 }) {
 
   const [postalCode, setPostalCode] = useState(""); // State to store the postal code
@@ -1101,6 +1110,7 @@ function Another({
         .then(function (response) {
           setCurrentList(response.data[0]);
           console.log(response.data[0])
+          setCurrentCost(response.data[1].cost);
           UpdateMapRoute(newStoresSelected, postalCode);
         })
         .catch(function (error) {
@@ -1153,6 +1163,9 @@ function Another({
         </div>
         <div className="flex flex-col space-y-4">
           <div className="flex flex-col space-y-3">
+          <div className="text-center text-3xl">
+              <h1><strong>Cost:</strong> <strong className="text-green-700">${currentCost}</strong></h1>
+            </div>
             <div className="grid grid-cols-4 gap-4">
               {stores.map((store, index) => (
                 <div
