@@ -3,6 +3,7 @@ import axios from 'axios';
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
 import SearchResultItem from "./entry";
+import approved from "./assets/check-mark.png";
 
 
 function InitMapRoute() {
@@ -1126,6 +1127,7 @@ export function GetYourStuff({ setScreenId }) {
         }}
       >
       <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white">
+        <h1 className="text-4xl font-bold">Complete Your Payment</h1>
         <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Email
           <input type="email" name="email" className="border rounded-lg p-2 ml-2" />
@@ -1218,6 +1220,7 @@ export function GetYourStuff({ setScreenId }) {
       {paybiltData !== null &&
         (approved ? (
           <>
+            {alert("Payment Complete!")}
             <h2 className="text-2xl font-bold">
               Payment complete! Thanks for shopping.
             </h2>
