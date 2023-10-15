@@ -847,14 +847,14 @@ function Ingredients({
       <div className="flex justify-end">
         <button
           onClick={firstPageNext}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold text-raisin-black font-fake-receipt"
+          className="bg-raisin-black rounded-full drop-shadow py-2 px-4 text-white font-bold text-raisin-black font-fake-receipt"
         >
           Next
           </button>
       </div>
       <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6 mt-14">
-        <div className="flex flex-col gap-8 justify-center h-[20rem] ">
-          <div className="bg-whitesmoke rounded-lg">
+        <div className="flex flex-col gap-8 justify-center h-[20rem]">
+          <div className="bg-whitesmoke rounded-lg drop-shadow">
           <h1 id="header" className="via-#21a179 animate-text bg-gradient-to-r from-cambridge-blue via-jungle-green to-black bg-clip-text text-5xl font-black text-transparent text-7xl text-raisin-black font-bold text-center font-sans">
             Grocery Run
           </h1>
@@ -863,7 +863,7 @@ function Ingredients({
             Start by adding the ingredients you want to buy
           </p>
           <div className="flex justify-center items-center">
-            <div className=" font-custom block w-fit p-6 bg-whitesmoke rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 justify-center items-center hover:animate-bounce">
+            <div className=" font-custom block w-fit p-6 bg-whitesmoke rounded-lg drop-shadow dark:border-gray-700 justify-center items-center hover:animate-bounce">
               <h1 className="text-3xl font-bold text-jungle-green">Here{"'"}s how it works:</h1>
               <ol className="list-decimal list-inside">
                 <li>You enter your grocery list</li>
@@ -895,7 +895,7 @@ function Ingredients({
                 onKeyUp={handleEnter}
               ></input>
               <button
-                className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
+                className="bg-jungle-green drop-shadow text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
                 onClick={handleAddIngredient}
               >
                 Enter
@@ -906,7 +906,7 @@ function Ingredients({
                 {ingredientsList.map((item, index) => (
                   <li key={index} className="mr-4 mb-4">
                     <div
-                      className="flex p-4 bg-jungle-green w-full rounded-md cursor-pointer"
+                      className="flex p-4 bg-jungle-green w-full rounded-md cursor-pointer drop-shadow"
                       key={index}
                     >
                       <div className="flex-grow space-x-3">
@@ -1110,19 +1110,19 @@ function Another({
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(0)}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Back
         </button>
         <button
           onClick={() => setScreenId(2)}
-          className="bg-emerald-500 rounded-full py-2 px-4 text-white"
+          className="bg-jungle-green rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Get it delivered instead! (Paybilt)
         </button>
         <button
           onClick={() => setScreenId(3)}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Get recipes
         </button>
@@ -1142,7 +1142,7 @@ function Another({
             onChange= {(e)=>setPostalCode(e.target.value)}
           ></input>
           <button
-            className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
+            className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen drop-shadow"
             onClick={handleAddPostalCode}
           >
             Add Postal Code
@@ -1155,7 +1155,7 @@ function Another({
                 <div
                   key={index}
                   onClick={() => handleStoreSelect(store)}
-                  className={`cursor-pointer p-2 rounded ${
+                  className={`cursor-pointer p-2 rounded drop-shadow text-center ${
                     storesSelected.includes(store) ? "bg-jungle-green" : "bg-cambridge-blue line-through"
                   }`}
                 >
@@ -1187,7 +1187,7 @@ export function SuggestRecipes({ setScreenId, recipe }) {
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(1)}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Back
         </button>
@@ -1218,7 +1218,7 @@ export function GetYourStuff({ setScreenId }) {
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(1)}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Back
         </button>
@@ -1267,7 +1267,7 @@ export function GetYourStuff({ setScreenId }) {
           }, 5000);
         }}
       >
-      <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white">
+      <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white drop-shadow">
         <h1 className="text-4xl font-bold">Complete Your Payment</h1>
         <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Email

@@ -17,7 +17,7 @@ export default {
         'whitesmoke': '#f5f5f5'
       },
       animation: {
-        'bounce': 'bounce 2.5s',
+        'bounce': 'bounce 2.5s infinite',
         'text': 'text 5s ease infinite'
       },
       keyframes: {
