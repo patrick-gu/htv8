@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from 'axios';
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
 import SearchResultItem from "./entry";
+import checkMark from "./assets/check-mark.png";
 
 
 function InitMapRoute() {
@@ -12,7 +13,7 @@ function InitMapRoute() {
 
 
 
-function MapRoute() {
+function MapRoute(initSuggestions) {
   async function initMap() {
     let origin = { lat: 43.7867303, lng: -79.1920265 };
    
@@ -46,7 +47,7 @@ function MapRoute() {
         map,
         position: origin,
         title: "Home",
-        content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+        content: new PinElement({ glyph: glyphImg, scale: 1.7}).element
     });
     home.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
@@ -214,7 +215,7 @@ function MapRoute() {
             position: result[1],
             title: result[2],
 
-            content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+            content: new PinElement({ glyph: glyphImg, scale: 2.1}).element
 
         });
 
@@ -278,11 +279,19 @@ function MapRoute() {
     
       
 }
-  initMap();  
+  initMap().then(initSuggestions);  
 }
 
 
 function UpdateMapRoute(storesSelected, postalCode) {
+    // console.log("!!!!!!!update")
+    const storesSorted = [...storesSelected];
+    storesSorted.sort();
+    const id = storesSorted.join(";") + ";" + postalCode;
+    // console.log(id);
+    
+
+
   async function updateMap() {
     var origin = { lat: 43.7867303, lng: -79.1920265 };
 
@@ -336,7 +345,7 @@ function UpdateMapRoute(storesSelected, postalCode) {
       map,
       position: origin,
       title: "Home",
-      content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+      content: new PinElement({ glyph: glyphImg, scale: 1.7}).element
   });
     home.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
@@ -379,26 +388,6 @@ function UpdateMapRoute(storesSelected, postalCode) {
     async function getLocations(stores) {
         
         let storetype;
-        function addPlaces(results, store) {
-            // for (const location of results) {
-            //     const marker = new AdvancedMarkerElement({
-            //         map,
-            //         position: location.geometry.location,
-            //         title: location.name,
-            //         content: new PinElement({ glyph: String(store[0]) }).element
-
-            //     });
-
-            //     marker.addListener("click", ({ domEvent, latLng }) => {
-            //         const { target } = domEvent;
-              
-            //         infoWindow.close();
-            //         infoWindow.setContent(marker.title);
-            //         infoWindow.open(marker.map, marker);
-            //       });    
-            // }
-        }
-
 
         for (let store of stores) {
             storetype = "supermarket"
@@ -425,10 +414,7 @@ function UpdateMapRoute(storesSelected, postalCode) {
                     })
             })
             if (status !== "OK" || !results) return;
-            addPlaces(results, store);
-            locations.push(results);
-
-            
+            locations.push(results);            
         }
         
         getMinDist(origin, locations, [], 0)
@@ -531,7 +517,7 @@ function UpdateMapRoute(storesSelected, postalCode) {
             position: result[1],
             title: result[2],
 
-            content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+            content: new PinElement({ glyph: glyphImg, scale: 2.1}).element
 
         });
 
@@ -596,17 +582,69 @@ function UpdateMapRoute(storesSelected, postalCode) {
 
 
 
+async function getMinDistNoDisplay(start, places, waypoints, time) {
+    // Distance Function
+    const distanceService = new google.maps.DistanceMatrixService();
+
+    let minRoute = [9999999999999999999, ""];
+    let request;
+    let result;
+
+
+    for (let i = 0; i < places.length; i++) {
+        
+        for (const store of places[i]) {
+
+            request = {
+                origins: [start],
+                destinations: [store.geometry.location],
+                travelMode: google.maps.TravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.METRIC,
+                avoidHighways: false,
+                avoidTolls: false,
+            };
+            
+            result = await new Promise((res,rej) => {
+                distanceService.getDistanceMatrix(request).then((response) => {
+                    
+                    let data = response.rows[0].elements[0];
+                    let time = Number(data.duration.text.split(" ")[0])
+
+                    if (time < minRoute[0]) {
+                        minRoute = [time, store.geometry.location, store.name, i];
+                    }
+                    res(minRoute);
+                });
+            })
+        }
+    }
+
+    waypoints.push(result[1]);
+    places.splice(result[3], 1);
+
+    time += result[0];
+
+
+    if (places.length === 0) {
+        return time
+    } 
+    else {
+        // console.log(places)
+        return getMinDistNoDisplay(result[1], places, waypoints, time);
+    }
+
+}
 
 
 
-function StoreSuggestions({ selectedStores }) {
+function StoreSuggestions({ selectedStores, setSelectedStores, suggestions }) {
   // For now, let's assume it's a simple array of suggestions
-  const suggestions = [
-    "Remove FreshCo from your run for $3.54 more to save 15 minutes on your run",
-    "Add FoodBasics to your run to save $15.20 for 10 minutes on your run",
-    "Don't eat to save 100% of the costs on this run",
-    "Eat 50% to to save 50% of the costs on this run",
-  ];
+//   const suggestions = [
+//     "Remove FreshCo from your run for $3.54 more to save 15 minutes on your run",
+//     "Add FoodBasics to your run to save $15.20 for 10 minutes on your run",
+//     "Don't eat to save 100% of the costs on this run",
+//     "Eat 50% to to save 50% of the costs on this run",
+//   ];
 
   return (
     <div>
@@ -624,9 +662,11 @@ function StoreSuggestions({ selectedStores }) {
     >
       <div className="flex space-x-2 overflow-y-hidden overflow-x-scroll w-screen h-auto">
         {suggestions.map((suggestion, index) => (
-          <div className="bg-yellow-100 p-2 rounded-lg" key={index} style={{height:"5vw",width:"100vw"}}>
-            <p>{suggestion}</p>
-          </div>
+          <button className="bg-yellow-100 p-2 rounded-lg" key={index} style={{height:"5vw",width:"100vw"}} onClick={() => {
+            setSelectedStores(selectedStores.toSpliced(selectedStores.indexOf(suggestion.store), 1));
+          }}>
+            <p>{suggestion.text}</p>
+          </button>
         ))}
       </div>
     </div>
@@ -670,6 +710,8 @@ function App() {
     "translate-x-[-300vw]",
   ][screenId];
 
+  const [suggestions, setSuggestions] = useState([]);
+
   return (
     <div className="w-full overflow-hidden h-full">
       <main
@@ -684,11 +726,10 @@ function App() {
           storesSelected={storesSelected}
           quantities={quantities}
           setQuantity={setQuantity}
-          currentCost={currentCost}
-          setCurrentCost={setCurrentCost}
           setRecipe={setRecipe}
           currentList={currentList}
           setCurrentList={setCurrentList}
+          setSuggestions={setSuggestions}
         />
         <Another
           stores={stores}
@@ -699,8 +740,8 @@ function App() {
           quantities={quantities}
           currentList={currentList}
           setCurrentList={setCurrentList}
-          currentCost={currentCost}
-          setCurrentCost={setCurrentCost}
+          suggestions={suggestions}
+          setSuggestions={setSuggestions}
         />
         <GetYourStuff setScreenId={setScreenId} />
         <SuggestRecipes setScreenId={setScreenId} recipe={recipe} />
@@ -718,12 +759,11 @@ function Ingredients({
   setScreenId,
   storesSelected,
   quantities,
-  currentCost,
-  setCurrentCost,
   setQuantity,
   setRecipe,
   currentList,
-  setCurrentList
+  setCurrentList,
+  setSuggestions,
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
@@ -739,11 +779,9 @@ function Ingredients({
         quantities: quantities,
       })
       .then(function (response) {
-        console.log(response.data[1].cost);  
         setCurrentList(response.data[0]);
-        setCurrentCost(response.data[1].cost);
         console.log(response.data[0]);
-        MapRoute();
+        MapRoute(() => findSuggestions({ postalCode: "", storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s)));
       })
       .catch(function (error) {
         console.log(error);
@@ -809,23 +847,23 @@ function Ingredients({
       <div className="flex justify-end">
         <button
           onClick={firstPageNext}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold text-raisin-black font-fake-receipt"
+          className="bg-raisin-black rounded-full drop-shadow py-2 px-4 text-white font-bold text-raisin-black font-fake-receipt"
         >
           Next
           </button>
       </div>
       <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6 mt-14">
-        <div className="flex flex-col gap-8 justify-center h-[20rem] ">
-          <div className="bg-whitesmoke rounded-lg">
-          <h1 id="header" className=" text-7xl text-raisin-black font-bold text-center font-sans">
+        <div className="flex flex-col gap-8 justify-center h-[20rem]">
+          <div className="bg-whitesmoke rounded-lg drop-shadow">
+          <h1 id="header" className="via-#21a179 animate-text bg-gradient-to-r from-cambridge-blue via-jungle-green to-black bg-clip-text text-5xl font-black text-transparent text-7xl text-raisin-black font-bold text-center font-sans">
             Grocery Run
           </h1>
           </div>
           <p className="text-center text-2xl">
-            Start by adding the items you want to buy
+            Start by adding the ingredients you want to buy
           </p>
           <div className="flex justify-center items-center">
-            <div className=" font-custom block w-fit p-6 bg-whitesmoke rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 justify-center items-center hover:animate-bounce">
+            <div className=" font-custom block w-fit p-6 bg-whitesmoke rounded-lg drop-shadow dark:border-gray-700 justify-center items-center hover:animate-bounce">
               <h1 className="text-3xl font-bold text-jungle-green">Here{"'"}s how it works:</h1>
               <ol className="list-decimal list-inside">
                 <li>You enter your grocery list</li>
@@ -844,20 +882,20 @@ function Ingredients({
           </div>
         </div>
         <div className="flex flex-col items-center">
-          <h2 className="text-2xl font-bold text-center">Grocery Items</h2>
+          <h2 className="text-3xl font-bold text-center my-1.5">Grocery Items</h2>
           <div className="mb-4">
             <div className="flex items-center">
               <input
                 className="shadow appearance-none border rounded w-fit py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
                 id="ingredient"
                 type="text"
-                placeholder="Enter your item!"
+                placeholder="Enter your ingredient!"
                 value={ingredient}
                 onChange={handleIngredientChange}
                 onKeyUp={handleEnter}
               ></input>
               <button
-                className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
+                className="bg-jungle-green drop-shadow text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
                 onClick={handleAddIngredient}
               >
                 Enter
@@ -868,7 +906,7 @@ function Ingredients({
                 {ingredientsList.map((item, index) => (
                   <li key={index} className="mr-4 mb-4">
                     <div
-                      className="flex p-4 bg-jungle-green w-full rounded-md cursor-pointer"
+                      className="flex p-4 bg-jungle-green w-full rounded-md cursor-pointer drop-shadow"
                       key={index}
                     >
                       <div className="flex-grow space-x-3">
@@ -899,6 +937,113 @@ function Ingredients({
   );
 }
 
+async function findSuggestions({ postalCode, storesSelected, ingredientsList, quantities }) {
+
+
+  const { Map } = await google.maps.importLibrary("maps");
+  const map = new Map(document.getElementById("map"), {
+      center: origin,
+      zoom: 12,
+      mapId: 'd5dc8cb3b04938bd',
+  });
+
+    const geocoder = new google.maps.Geocoder();
+    console.log(`req ${postalCode}`)
+    const origin = postalCode !== "" ? await new Promise((res, rej) => {
+        geocoder.geocode({ 'address': 'zipcode ' + postalCode }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                var latitude = results[0].geometry.location.lat();
+                var longitude = results[0].geometry.location.lng();
+                res({lat: latitude, lng: longitude})
+
+            } else {
+                alert("Request failed.")
+            }
+        }); 
+    }) : { lat: 43.7867303, lng: -79.1920265 };
+    if (storesSelected.length <= 1) {
+        return [];
+    }
+    const { data } = await axios
+      .post("http://127.0.0.1:8080/filter", {
+        storesList: storesSelected,
+        shoppingList: ingredientsList,
+        quantities: quantities,
+      });
+
+
+    const placesService = new google.maps.places.PlacesService(map);
+
+        const symb = Symbol("initialStoreName")
+
+      let locations = [];
+      let collapseStores = [];
+      for (let store of storesSelected) {
+            let storetype = "supermarket"
+            if (store === "NoFrills" || store === "FreshCo" || store === "Superstore") storetype = "grocery_or_supermarket";
+            if (store === "Costco") storetype = "department_store";
+
+            const {results, status } = await new Promise((res, rej) => {
+                placesService.nearbySearch(
+                    { location: origin, radius: 10000, name: store, type: storetype},
+                    (results, status) => {
+
+                        if (store === "Costco") {
+                            results = results.filter((v) => (v.name !== "Costco Business Centre"))
+                        }
+
+                        if (store === "Superstore") {
+                            results = results.filter((v) => (v.name.includes("Real Canadian")))
+                        }
+                        
+                        res({ results, status});
+                    })
+            })
+            if (status !== "OK" || !results) {
+                // locations.push([]);
+                continue;
+            }
+            locations.push(results);     
+            collapseStores.push(store);       
+        }
+        console.log("loc", locations);
+
+    console.log(`data`, data);
+    const initPrice = parseFloat(data[1]["cost"]);
+    const initDist = await getMinDistNoDisplay(origin, [...locations], [], 0);
+    console.log(`!!!!!!!!!!!! ${initPrice} ${initDist} ${locations.length}`)
+    let ret = [];
+    for (let i = 0; i < locations.length; i++) {
+        const stores = [...locations.slice(0, i), ...locations.slice(i + 1)];
+        const dist = await getMinDistNoDisplay(origin, stores, [], 0);
+        const storesList = [...collapseStores.slice(0, i), ...collapseStores.slice(i + 1)];
+        console.log("stores list", storesList)
+        const { data } = await axios
+            .post("http://127.0.0.1:8080/filter", {
+                storesList,
+                shoppingList: ingredientsList,
+                quantities: quantities,
+            });
+        console.log("dat", data);
+        const price = parseFloat(data[1]["cost"]);
+        const priceDiff = price - initPrice;
+        const distDiff = dist - initDist;
+        console.log(`price ${price} ${dist}`)
+        ret.push({ store: collapseStores[i], priceDiff, distDiff });
+    }
+    let ans = [];
+    for (const { store, priceDiff, distDiff } of ret) {
+        if (priceDiff > 0 && distDiff > 0) {
+            continue;
+        }
+        const s = `Save ${-distDiff} minutes for $${priceDiff.toFixed(2)} more by skipping ${store}`;
+        ans.push({ text: s, store });
+    }
+    console.log("ans");
+    console.log(ans);
+    return ans;
+}
+
 function Another({ 
   stores, 
   storesSelected, 
@@ -908,8 +1053,8 @@ function Another({
   quantities, 
   currentList, 
   setCurrentList,
-  currentCost,
-  setCurrentCost
+  suggestions,
+  setSuggestions,
 }) {
 
   const [postalCode, setPostalCode] = useState(""); // State to store the postal code
@@ -931,14 +1076,23 @@ function Another({
     // console.log(e.target.value);
   };
 
+  useEffect(() => {
+    setSuggestions([]);
+    findSuggestions({ postalCode, storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s));
+  }, [postalCode, storesSelected, ingredientsList, quantities]);
+
   const handleStoreSelect = async(store) => {
+    let newStoresSelected;
     if (storesSelected.includes(store)) {
       // Store is already selected, remove it and change the background to white
-      const newStoresSelected=storesSelected.filter((selectedStore) => selectedStore !== store);
-      setStoresSelected(
-        newStoresSelected
-      );
-
+      newStoresSelected=storesSelected.filter((selectedStore) => selectedStore !== store);
+    }
+    else {
+      // Store is not selected, add it and change the background to green
+      newStoresSelected = [...storesSelected, store];
+    }
+    setStoresSelected(newStoresSelected);
+    
       await axios.post('http://127.0.0.1:8080/filter', {
         storesList: newStoresSelected,
         shoppingList: ingredientsList,
@@ -952,27 +1106,6 @@ function Another({
         .catch(function (error) {
           console.log(error);
         });
-    }
-    else {
-      // Store is not selected, add it and change the background to green
-      
-      setStoresSelected([...storesSelected, store]);
-      const newStoresSelected = [...storesSelected, store];
-
-      await axios.post('http://127.0.0.1:8080/filter', {
-        storesList: [...storesSelected, store],
-        shoppingList: ingredientsList,
-        quantities: quantities
-        })
-        .then(function (response) {
-          setCurrentList(response.data[0]);
-          console.log(response.data[0])
-          UpdateMapRoute(newStoresSelected, postalCode);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
     //call filter endpoint whenever StoresSelected changes
   }
   return (
@@ -980,19 +1113,19 @@ function Another({
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(0)}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Back
         </button>
         <button
           onClick={() => setScreenId(2)}
-          className="bg-emerald-500 rounded-full py-2 px-4 text-white"
+          className="bg-jungle-green rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Get it delivered instead! (Paybilt)
         </button>
         <button
           onClick={() => setScreenId(3)}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Get recipes
         </button>
@@ -1012,7 +1145,7 @@ function Another({
             onChange= {(e)=>setPostalCode(e.target.value)}
           ></input>
           <button
-            className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
+            className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen drop-shadow"
             onClick={handleAddPostalCode}
           >
             Add Postal Code
@@ -1020,17 +1153,12 @@ function Another({
         </div>
         <div className="flex flex-col space-y-4">
           <div className="flex flex-col space-y-3">
-            <div className="text-center">hi
-              <h1>Cost: {currentCost}</h1>
-              {/* <h1>Drive Time: {driveTime}</h1>
-              <h2>Cost: {cost}</h1> */}
-            </div>
             <div className="grid grid-cols-4 gap-4">
               {stores.map((store, index) => (
                 <div
                   key={index}
                   onClick={() => handleStoreSelect(store)}
-                  className={`cursor-pointer p-2 rounded ${
+                  className={`cursor-pointer p-2 rounded drop-shadow text-center ${
                     storesSelected.includes(store) ? "bg-jungle-green" : "bg-cambridge-blue line-through"
                   }`}
                 >
@@ -1038,7 +1166,7 @@ function Another({
                 </div>
               ))}
             </div>
-            <StoreSuggestions selectedStores={storesSelected} />
+            <StoreSuggestions selectedStores={storesSelected} setSelectedStores={setStoresSelected} suggestions={suggestions} />
             <InitMapRoute />
             <div>
               <div className="grid grid-cols-3" id="resultsList">
@@ -1062,7 +1190,7 @@ export function SuggestRecipes({ setScreenId, recipe }) {
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(1)}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Back
         </button>
@@ -1093,7 +1221,7 @@ export function GetYourStuff({ setScreenId }) {
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(1)}
-          className="bg-raisin-black rounded-full py-2 px-4 text-white"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold drop-shadow"
         >
           Back
         </button>
@@ -1142,7 +1270,10 @@ export function GetYourStuff({ setScreenId }) {
           }, 5000);
         }}
       >
-      <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white">
+      <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white drop-shadow">
+        <h1 className="text-4xl font-bold">Complete Your Payment</h1>
+        {approved ?(<img src={checkMark} />):(
+        <div>  
         <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Email
           <input type="email" name="email" className="border rounded-lg p-2 ml-2" />
@@ -1230,6 +1361,8 @@ export function GetYourStuff({ setScreenId }) {
           <div class="absolute inset-0 w-0 bg-cambridge-blue transition-all duration-[250ms] ease-out group-hover:w-full"></div>
           <span class="relative text-white group-hover:text-black">Pay with Paybilt</span>
         </button>
+        </div>
+        )}
         </div>
       </form>
       {paybiltData !== null &&
