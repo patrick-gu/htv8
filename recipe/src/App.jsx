@@ -283,6 +283,14 @@ function MapRoute() {
 
 
 function UpdateMapRoute(storesSelected, postalCode) {
+    // console.log("!!!!!!!update")
+    const storesSorted = [...storesSelected];
+    storesSorted.sort();
+    const id = storesSorted.join(";") + ";" + postalCode;
+    // console.log(id);
+    
+
+
   async function updateMap() {
     var origin = { lat: 43.7867303, lng: -79.1920265 };
 
@@ -379,26 +387,6 @@ function UpdateMapRoute(storesSelected, postalCode) {
     async function getLocations(stores) {
         
         let storetype;
-        function addPlaces(results, store) {
-            // for (const location of results) {
-            //     const marker = new AdvancedMarkerElement({
-            //         map,
-            //         position: location.geometry.location,
-            //         title: location.name,
-            //         content: new PinElement({ glyph: String(store[0]) }).element
-
-            //     });
-
-            //     marker.addListener("click", ({ domEvent, latLng }) => {
-            //         const { target } = domEvent;
-              
-            //         infoWindow.close();
-            //         infoWindow.setContent(marker.title);
-            //         infoWindow.open(marker.map, marker);
-            //       });    
-            // }
-        }
-
 
         for (let store of stores) {
             storetype = "supermarket"
@@ -425,10 +413,7 @@ function UpdateMapRoute(storesSelected, postalCode) {
                     })
             })
             if (status !== "OK" || !results) return;
-            addPlaces(results, store);
-            locations.push(results);
-
-            
+            locations.push(results);            
         }
         
         getMinDist(origin, locations, [], 0)
@@ -596,17 +581,69 @@ function UpdateMapRoute(storesSelected, postalCode) {
 
 
 
+async function getMinDistNoDisplay(start, places, waypoints, time) {
+    // Distance Function
+    const distanceService = new google.maps.DistanceMatrixService();
+
+    let minRoute = [9999999999999999999, ""];
+    let request;
+    let result;
+
+
+    for (let i = 0; i < places.length; i++) {
+        
+        for (const store of places[i]) {
+
+            request = {
+                origins: [start],
+                destinations: [store.geometry.location],
+                travelMode: google.maps.TravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.METRIC,
+                avoidHighways: false,
+                avoidTolls: false,
+            };
+            
+            result = await new Promise((res,rej) => {
+                distanceService.getDistanceMatrix(request).then((response) => {
+                    
+                    let data = response.rows[0].elements[0];
+                    let time = Number(data.duration.text.split(" ")[0])
+
+                    if (time < minRoute[0]) {
+                        minRoute = [time, store.geometry.location, store.name, i];
+                    }
+                    res(minRoute);
+                });
+            })
+        }
+    }
+
+    waypoints.push(result[1]);
+    places.splice(result[3], 1);
+
+    time += result[0];
+
+
+    if (places.length === 0) {
+        return time
+    } 
+    else {
+        // console.log(places)
+        return getMinDistNoDisplay(result[1], places, waypoints, time);
+    }
+
+}
 
 
 
-function StoreSuggestions({ selectedStores }) {
+function StoreSuggestions({ selectedStores, suggestions }) {
   // For now, let's assume it's a simple array of suggestions
-  const suggestions = [
-    "Remove FreshCo from your run for $3.54 more to save 15 minutes on your run",
-    "Add FoodBasics to your run to save $15.20 for 10 minutes on your run",
-    "Don't eat to save 100% of the costs on this run",
-    "Eat 50% to to save 50% of the costs on this run",
-  ];
+//   const suggestions = [
+//     "Remove FreshCo from your run for $3.54 more to save 15 minutes on your run",
+//     "Add FoodBasics to your run to save $15.20 for 10 minutes on your run",
+//     "Don't eat to save 100% of the costs on this run",
+//     "Eat 50% to to save 50% of the costs on this run",
+//   ];
 
   return (
     <div>
@@ -625,7 +662,7 @@ function StoreSuggestions({ selectedStores }) {
       <div className="flex space-x-2 overflow-y-hidden overflow-x-scroll w-screen h-auto">
         {suggestions.map((suggestion, index) => (
           <div className="bg-yellow-100 p-2 rounded-lg" key={index} style={{height:"5vw",width:"100vw"}}>
-            <p>{suggestion}</p>
+            <p>{suggestion.text}</p>
           </div>
         ))}
       </div>
@@ -889,6 +926,110 @@ function Ingredients({
   );
 }
 
+async function findSuggestions({ postalCode, storesSelected, ingredientsList, quantities }) {
+    const geocoder = new google.maps.Geocoder();
+    console.log(`req ${postalCode}`)
+    const origin = postalCode !== "" ? await new Promise((res, rej) => {
+        geocoder.geocode({ 'address': 'zipcode ' + postalCode }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                var latitude = results[0].geometry.location.lat();
+                var longitude = results[0].geometry.location.lng();
+                res({lat: latitude, lng: longitude})
+
+            } else {
+                alert("Request failed.")
+            }
+        }); 
+    }) : { lat: 43.7867303, lng: -79.1920265 };
+    if (storesSelected.length <= 1) {
+        return [];
+    }
+    const { data } = await axios
+      .post("http://127.0.0.1:8080/filter", {
+        storesList: storesSelected,
+        shoppingList: ingredientsList,
+        quantities: quantities,
+      });
+
+    const { Map } = await google.maps.importLibrary("maps");
+    const map = new Map(document.getElementById("map"), {
+        center: origin,
+        zoom: 12,
+        mapId: 'd5dc8cb3b04938bd',
+    });
+
+    const placesService = new google.maps.places.PlacesService(map);
+
+        const symb = Symbol("initialStoreName")
+
+      let locations = [];
+      let collapseStores = [];
+      for (let store of storesSelected) {
+            let storetype = "supermarket"
+            if (store === "NoFrills" || store === "FreshCo" || store === "Superstore") storetype = "grocery_or_supermarket";
+            if (store === "Costco") storetype = "department_store";
+
+            const {results, status } = await new Promise((res, rej) => {
+                placesService.nearbySearch(
+                    { location: origin, radius: 10000, name: store, type: storetype},
+                    (results, status) => {
+
+                        if (store === "Costco") {
+                            results = results.filter((v) => (v.name !== "Costco Business Centre"))
+                        }
+
+                        if (store === "Superstore") {
+                            results = results.filter((v) => (v.name.includes("Real Canadian")))
+                        }
+                        
+                        res({ results, status});
+                    })
+            })
+            if (status !== "OK" || !results) {
+                // locations.push([]);
+                continue;
+            }
+            locations.push(results);     
+            collapseStores.push(store);       
+        }
+        console.log("loc", locations);
+
+    console.log(`data`, data);
+    const initPrice = parseFloat(data[1]["cost"]);
+    const initDist = await getMinDistNoDisplay(origin, [...locations], [], 0);
+    console.log(`!!!!!!!!!!!! ${initPrice} ${initDist} ${locations.length}`)
+    let ret = [];
+    for (let i = 0; i < locations.length; i++) {
+        const stores = [...locations.slice(0, i), ...locations.slice(i + 1)];
+        const dist = await getMinDistNoDisplay(origin, stores, [], 0);
+        const storesList = [...collapseStores.slice(0, i), ...collapseStores.slice(i + 1)];
+        console.log("stores list", storesList)
+        const { data } = await axios
+            .post("http://127.0.0.1:8080/filter", {
+                storesList,
+                shoppingList: ingredientsList,
+                quantities: quantities,
+            });
+        console.log("dat", data);
+        const price = parseFloat(data[1]["cost"]);
+        const priceDiff = price - initPrice;
+        const distDiff = dist - initDist;
+        console.log(`price ${price} ${dist}`)
+        ret.push({ store: collapseStores[i], priceDiff, distDiff });
+    }
+    let ans = [];
+    for (const { store, priceDiff, distDiff } of ret) {
+        if (priceDiff > 0 && distDiff > 0) {
+            continue;
+        }
+        const s = `Save ${-distDiff} minutes for $${priceDiff.toFixed(2)} more by skipping ${store}`;
+        ans.push({ text: s, id: 0 });
+    }
+    console.log("ans");
+    console.log(ans);
+    return ans;
+}
+
 function Another({ 
   stores, 
   storesSelected, 
@@ -902,9 +1043,13 @@ function Another({
 
   const [postalCode, setPostalCode] = useState(""); // State to store the postal code
 
+  const [suggestions, setSuggestions] = useState([]);
+
   // Function to handle changes in the postal code input field
   const handlePostalCodeChange = (e) => {
     setPostalCode(e.target.value);
+    setSuggestions([]);
+    findSuggestions({ postalCode, storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s));
   };
 
   // Function to add the entered postal code to the state
@@ -930,6 +1075,8 @@ function Another({
       newStoresSelected = [...storesSelected, store];
     }
     setStoresSelected(newStoresSelected);
+    setSuggestions([]);
+    findSuggestions({ postalCode, storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s));
     
       await axios.post('http://127.0.0.1:8080/filter', {
         storesList: newStoresSelected,
@@ -1004,7 +1151,7 @@ function Another({
                 </div>
               ))}
             </div>
-            <StoreSuggestions selectedStores={storesSelected} />
+            <StoreSuggestions selectedStores={storesSelected} suggestions={suggestions} />
             <InitMapRoute />
             <div>
               <div className="grid grid-cols-3" id="resultsList">
