@@ -735,7 +735,7 @@ function Ingredients({
       </div>
       <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
         <div className="flex flex-col gap-8 justify-center h-[20rem]">
-          <h1 id="header" className="text-7xl text-raisin-black font-bold text-center font-sans mt-14">
+          <h1 id="header" className="bg-whitesmoke text-7xl text-raisin-black font-bold text-center font-sans mt-14">
             Grocery Run
           </h1>
           <p className="text-center text-2xl">
@@ -1052,7 +1052,7 @@ export function GetYourStuff({ setScreenId }) {
           }, 5000);
         }}
       >
-      <div className="flex flex-col space-y-4 justify-center items-start">
+      <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white">
         <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Email
           <input type="email" name="email" className="border rounded-lg p-2 ml-2" />
