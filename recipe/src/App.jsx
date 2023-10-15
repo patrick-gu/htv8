@@ -882,7 +882,7 @@ function Ingredients({
           </div>
         </div>
         <div className="flex flex-col items-center">
-          <h2 className="text-2xl font-bold text-center">Grocery Items</h2>
+          <h2 className="text-3xl font-bold text-center my-1.5">Grocery Items</h2>
           <div className="mb-4">
             <div className="flex items-center">
               <input
@@ -938,6 +938,15 @@ function Ingredients({
 }
 
 async function findSuggestions({ postalCode, storesSelected, ingredientsList, quantities }) {
+
+
+  const { Map } = await google.maps.importLibrary("maps");
+  const map = new Map(document.getElementById("map"), {
+      center: origin,
+      zoom: 12,
+      mapId: 'd5dc8cb3b04938bd',
+  });
+
     const geocoder = new google.maps.Geocoder();
     console.log(`req ${postalCode}`)
     const origin = postalCode !== "" ? await new Promise((res, rej) => {
@@ -962,12 +971,6 @@ async function findSuggestions({ postalCode, storesSelected, ingredientsList, qu
         quantities: quantities,
       });
 
-    const { Map } = await google.maps.importLibrary("maps");
-    const map = new Map(document.getElementById("map"), {
-        center: origin,
-        zoom: 12,
-        mapId: 'd5dc8cb3b04938bd',
-    });
 
     const placesService = new google.maps.places.PlacesService(map);
 
