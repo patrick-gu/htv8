@@ -934,7 +934,7 @@ function Ingredients({
                 onKeyUp={handleEnter}
               ></input>
               <button
-                className="bg-jungle-green drop-shadow text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
+                className="bg-jungle-green drop-shadow text-white font-bold py-2 px-4 rounded-full hover:bg-hover-dgreen"
                 onClick={handleAddIngredient}
               >
                 Enter
@@ -1161,7 +1161,7 @@ function Another({
         </button>
         <button
           onClick={() => setScreenId(2)}
-          className="bg-jungle-green rounded-full py-2 px-4 text-white font-bold drop-shadow"
+          className="bg-jungle-green rounded-full hover:bg-hover-dgreen py-2 px-4 text-white font-bold drop-shadow"
         >
           Get it delivered instead! (Paybilt)
         </button>
@@ -1187,7 +1187,7 @@ function Another({
             onChange= {(e)=>setPostalCode(e.target.value)}
           ></input>
           <button
-            className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen drop-shadow"
+            className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-hover-dgreen drop-shadow"
             onClick={handleAddPostalCode}
           >
             Add Postal Code
@@ -1203,8 +1203,8 @@ function Another({
                 <div
                   key={index}
                   onClick={() => handleStoreSelect(store)}
-                  className={`cursor-pointer p-2 rounded drop-shadow text-center ${
-                    storesSelected.includes(store) ? "bg-jungle-green" : "bg-cambridge-blue line-through"
+                  className={`cursor-pointer p-2 rounded drop-shadow text-center text-white ${
+                    storesSelected.includes(store) ? "bg-jungle-green hover:bg-hover-dgreen" : "bg-cambridge-blue hover:bg-hover-lgreen line-through"
                   }`}
                 >
                   {store}

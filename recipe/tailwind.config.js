@@ -9,11 +9,12 @@ export default {
       colors: {
         'khaki': '#c4af9a',
         'jungle-green': '#21a179',
-        'cambridge-blue': '#81ae9d',
+        'cambridge-blue': '#7cdebf' ,
         'coral-pink': '#fb9f89',
         'dcoral-pink': '#b37262',
         'raisin-black': '#1e1e24',
         'hover-dgreen': '#0D4533',
+        'hover-lgreen': '#81ae9d',
         'whitesmoke': '#f5f5f5'
       },
       animation: {
