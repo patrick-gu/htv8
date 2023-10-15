@@ -807,11 +807,13 @@ function Ingredients({
           Next
           </button>
       </div>
-      <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
-        <div className="flex flex-col gap-8 justify-center h-[20rem]">
-          <h1 id="header" className="bg-whitesmoke text-7xl text-raisin-black font-bold text-center font-sans mt-14">
+      <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6 mt-14">
+        <div className="flex flex-col gap-8 justify-center h-[20rem] ">
+          <div className="bg-whitesmoke rounded-lg">
+          <h1 id="header" className=" text-7xl text-raisin-black font-bold text-center font-sans">
             Grocery Run
           </h1>
+          </div>
           <p className="text-center text-2xl">
             Start by adding the ingredients you want to buy
           </p>
