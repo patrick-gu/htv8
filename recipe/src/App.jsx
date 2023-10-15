@@ -46,7 +46,7 @@ function MapRoute() {
         map,
         position: origin,
         title: "Home",
-        content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+        content: new PinElement({ glyph: glyphImg, scale: 1.7}).element
     });
     home.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
@@ -214,7 +214,7 @@ function MapRoute() {
             position: result[1],
             title: result[2],
 
-            content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+            content: new PinElement({ glyph: glyphImg, scale: 2.1}).element
 
         });
 
@@ -336,7 +336,7 @@ function UpdateMapRoute(storesSelected, postalCode) {
       map,
       position: origin,
       title: "Home",
-      content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+      content: new PinElement({ glyph: glyphImg, scale: 1.7}).element
   });
     home.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
@@ -531,7 +531,7 @@ function UpdateMapRoute(storesSelected, postalCode) {
             position: result[1],
             title: result[2],
 
-            content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+            content: new PinElement({ glyph: glyphImg, scale: 2.1}).element
 
         });
 
