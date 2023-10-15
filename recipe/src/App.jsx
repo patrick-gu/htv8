@@ -735,22 +735,27 @@ function Ingredients({
       </div>
       <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
         <div className="flex flex-col gap-8 justify-center h-[20rem]">
-          <h1 id="header" className="text-7xl text-raisin-black font-bold text-center font-sans">
+          <h1 id="header" className="text-7xl text-raisin-black font-bold text-center font-sans mt-14">
             Grocery Run
           </h1>
-          <p className="text-center">
+          <p className="text-center text-2xl">
             Start by adding the ingredients you want to buy
           </p>
           <div className="flex justify-center items-center">
             <div className=" font-custom block w-fit p-6 bg-whitesmoke rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 justify-center items-center hover:animate-bounce">
-              <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
+              <h1 className="text-3xl font-bold text-jungle-green">Here{"'"}s how it works:</h1>
               <ol className="list-decimal list-inside">
-                <li>You enter the recipe that you want</li>
-                <li>
-                  We find the best deals from local stores to fulfill your
-                  recipe
+                <li>You enter your grocery list</li>
+                <li className="my-2">
+                  We find the best deals from local stores and give you travel paths, the projected time you'll spend shopping, and the cost.
                 </li>
-                <li>You save time and money for that next meal!</li>
+                <li className="my-2">
+                  If you don't want to drive, checkout with Paybilt Instant Interact E-transfer.
+                </li>
+                <li className="my-2">
+                  As a bonus, find recipes you can make with your ingredients.
+                </li >
+                <li className="my-2">You save time and money for that next meal!</li>
               </ol>
             </div>
           </div>
@@ -979,7 +984,7 @@ export function SuggestRecipes({ setScreenId, recipe }) {
         </button> */}
       </div>
       <div className="space-y-8 flex-grow">
-        <h1 className="text-4xl font-bold">What are you cooking?</h1>
+        <h1 className="text-4xl font-bold">Need help with meal prep?</h1>
         <h2 className="text-xl">Here&apos;s a recipe suggestion:</h2>
         <p className="whitespace-pre-line">
           {recipe.length !== 0 ? recipe : "Loading a recipe..."}
