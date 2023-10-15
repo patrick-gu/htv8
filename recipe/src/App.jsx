@@ -724,6 +724,7 @@ function App() {
           setIngredientsList={setIngredientsList}
           setScreenId={setScreenId}
           storesSelected={storesSelected}
+          setStoresSelected={setStoresSelected}
           quantities={quantities}
           setQuantity={setQuantity}
           setRecipe={setRecipe}
@@ -770,6 +771,7 @@ function Ingredients({
   setSuggestions,
   currentCost,
   setCurrentCost,
+  setStoresSelected,
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
@@ -787,8 +789,34 @@ function Ingredients({
       .then(function (response) {
         setCurrentList(response.data[0]);
         console.log(response.data[0]);
+        console.log(response.data[0][0].store);
         setCurrentCost(response.data[1].cost);
-        MapRoute(() => findSuggestions({ postalCode: "", storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s)));
+
+        let keepStores = [];
+        for (let place of response.data[0]) {
+          
+          if (place.store == null) {
+            if (! keepStores.includes("Walmart")) {
+              keepStores.push("Walmart");
+            }
+          }
+          else {
+            if (! keepStores.includes(place.store)) {
+              keepStores.push(place.store);
+            }
+          }
+        }
+
+        console.log(keepStores);
+
+        setStoresSelected(keepStores);
+
+        storesSelected = keepStores;
+
+        console.log(storesSelected);
+        UpdateMapRoute(storesSelected, "");
+
+        // MapRoute(() => findSuggestions({ postalCode: "", storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s)));
       })
       .catch(function (error) {
         console.log(error);
@@ -1372,7 +1400,7 @@ export function GetYourStuff({ setScreenId }) {
           className="relative group bg-hover-dgreen rounded-full py-2 px-4 text-white overflow-hidden"
         >
           <div class="absolute inset-0 w-0 bg-cambridge-blue transition-all duration-[250ms] ease-out group-hover:w-full"></div>
-          <span class="relative text-white group-hover:text-black justify-center">Pay with Paybilt</span>
+          <span class="relative text-white group-hover:text-black justify-center">Pay with Paybilt 💵</span>
         </button>
         </label>
         </div>
