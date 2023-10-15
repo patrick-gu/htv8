@@ -31,14 +31,22 @@ function MapRoute() {
 
 
       const infoWindow = new InfoWindow();
+
       
+      let glyphImg = document.createElement("img");
+
+
+      glyphImg.style.cssText = "border-radius:50% ; width:30px ; height:30px; ";
+      
+  
+      glyphImg.src = "https://cdn-icons-png.flaticon.com/512/25/25694.png"
 
 
       const home = new AdvancedMarkerElement({
         map,
         position: origin,
         title: "Home",
-        content: new PinElement({ glyph: String(0) }).element
+        content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
     });
     home.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
@@ -168,33 +176,60 @@ function MapRoute() {
                 })
             }
         }
-        console.log(result[3], places, places[result[3]])
+        // console.log(result[3], places, places[result[3]])
 
 
 
-        waypoints.push(result[1]);
-        places.splice(result[3], 1);
 
-        time = time += result[0]
+        const glyphImg = document.createElement("img");
 
+
+        glyphImg.style.cssText = "border-radius:50% ; width:50px ; height:50px; ";
+        
+        console.log("result", )
+        if (result[2].includes("FreshCo")) {
+          glyphImg.src = "https://play-lh.googleusercontent.com/c99A-kM7LqPxF0w0JlZEhpeM-r8Z2Bfwx81DLhlEeZfgdIb1Gttr98xpqcuiiMEaOQ"
+        }
+        else if (result[2].includes("Superstore")) {
+          glyphImg.src = "https://mma.prnewswire.com/media/2079950/Loblaw_Companies_Limited_Real_Canadian_Superstore_expands_one_st.jpg?p=twitter"
+        }
+        else if (result[2].includes("Walmart")) {
+          glyphImg.src = "https://latn.com/wp-content/uploads/2014/12/walmart-logo-vector.png"
+        }
+        else if (result[2].includes("Metro")) {
+          glyphImg.src = "https://www.metro.ca/userfiles/image/facebook/share/metro-1.jpg"
+        }
+        else if (result[2].includes("Food Basics")) {
+          glyphImg.src = "https://play-lh.googleusercontent.com/hFrI33FcTD-K7U80jxMA2PkiEBUPJkM1B6AL87g3mit8Cj_mFH0TSFGdqfmYeJiBce4"
+        }
+        else if (result[2].includes("NOFRILLS")) {
+          glyphImg.src = "https://scontent-yyz1-1.xx.fbcdn.net/v/t39.30808-6/386163090_711078084400040_820691302660380194_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_ohc=H4iA0BnkAfoAX-KiA_-&_nc_ht=scontent-yyz1-1.xx&oh=00_AfAlMDuJ3e914CbIjPog9Q9iGMbOFIcOwuK8gZT6p7NhNA&oe=652F5BE8"
+        }
+        else if (result[2].includes("Costco")) {
+          glyphImg.src = "https://www.procurant.com/hs-fs/hubfs/costco-wholesale-logo-logo.png?width=1435&name=costco-wholesale-logo-logo.png"
+        }
 
         const marker = new AdvancedMarkerElement({
             map,
             position: result[1],
             title: result[2],
-            content: new PinElement({ glyph: String(result[2])[0] }).element
+
+            content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
 
         });
 
         marker.addListener("click", ({ domEvent, latLng }) => {
-            const { target } = domEvent;
-      
-            infoWindow.close();
-            infoWindow.setContent(marker.title);
-            infoWindow.open(marker.map, marker);
-          });    
+          const { target } = domEvent;
+    
+          infoWindow.close();
+          infoWindow.setContent(marker.title);
+          infoWindow.open(marker.map, marker);
+        });    
 
+        waypoints.push(result[1]);
+        places.splice(result[3], 1);
 
+        time = time += result[0]
 
         if (places.length === 0) {
             calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints, time);
@@ -203,7 +238,6 @@ function MapRoute() {
             // console.log(places)
             getMinDist(result[1], places, waypoints, time);
         }
-
     }
 
 
@@ -287,14 +321,23 @@ function UpdateMapRoute(storesSelected, postalCode) {
 
     console.log(origin);
 
+
+      
+    let glyphImg = document.createElement("img");
+
+
+    glyphImg.style.cssText = "border-radius:50% ; width:30px ; height:30px; ";
     
 
+    glyphImg.src = "https://cdn-icons-png.flaticon.com/512/25/25694.png"
+
+
     const home = new AdvancedMarkerElement({
-        map,
-        position: origin,
-        title: "Home",
-        content: new PinElement({ glyph: String(0) }).element
-    });
+      map,
+      position: origin,
+      title: "Home",
+      content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+  });
     home.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
   
@@ -454,11 +497,41 @@ function UpdateMapRoute(storesSelected, postalCode) {
         time = time += result[0];
 
 
+
+        const glyphImg = document.createElement("img");
+
+
+        glyphImg.style.cssText = "border-radius:50% ; width:50px ; height:50px; ";
+        
+        console.log("result", )
+        if (result[2].includes("FreshCo")) {
+          glyphImg.src = "https://play-lh.googleusercontent.com/c99A-kM7LqPxF0w0JlZEhpeM-r8Z2Bfwx81DLhlEeZfgdIb1Gttr98xpqcuiiMEaOQ"
+        }
+        else if (result[2].includes("Superstore")) {
+          glyphImg.src = "https://mma.prnewswire.com/media/2079950/Loblaw_Companies_Limited_Real_Canadian_Superstore_expands_one_st.jpg?p=twitter"
+        }
+        else if (result[2].includes("Walmart")) {
+          glyphImg.src = "https://latn.com/wp-content/uploads/2014/12/walmart-logo-vector.png"
+        }
+        else if (result[2].includes("Metro")) {
+          glyphImg.src = "https://www.metro.ca/userfiles/image/facebook/share/metro-1.jpg"
+        }
+        else if (result[2].includes("Food Basics")) {
+          glyphImg.src = "https://play-lh.googleusercontent.com/hFrI33FcTD-K7U80jxMA2PkiEBUPJkM1B6AL87g3mit8Cj_mFH0TSFGdqfmYeJiBce4"
+        }
+        else if (result[2].includes("NOFRILLS")) {
+          glyphImg.src = "https://scontent-yyz1-1.xx.fbcdn.net/v/t39.30808-6/386163090_711078084400040_820691302660380194_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_ohc=H4iA0BnkAfoAX-KiA_-&_nc_ht=scontent-yyz1-1.xx&oh=00_AfAlMDuJ3e914CbIjPog9Q9iGMbOFIcOwuK8gZT6p7NhNA&oe=652F5BE8"
+        }
+        else if (result[2].includes("Costco")) {
+          glyphImg.src = "https://www.procurant.com/hs-fs/hubfs/costco-wholesale-logo-logo.png?width=1435&name=costco-wholesale-logo-logo.png"
+        }
+
         const marker = new AdvancedMarkerElement({
             map,
             position: result[1],
             title: result[2],
-            content: new PinElement({ glyph: String(result[2])[0] }).element
+
+            content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
 
         });
 
