@@ -12,7 +12,8 @@ const SearchResultItem = ({item}) => {
             <div className="flex justify-center my-5">
             <img className="w-auto h-40 object-cover rounded-lg" src={item.img} alt="pic" />
             </div>
-            <h1 className="text-lg font-bold">${parseFloat(item.price).toFixed(2)}</h1>
+            <h1>Units: {item.quantity}</h1>
+            <h1 className="text-lg font-bold">${(parseFloat(item.price)*item.quantity).toFixed(2)}</h1>
         </div>  
       
     );

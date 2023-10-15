@@ -3,6 +3,7 @@ import axios from 'axios';
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
 import SearchResultItem from "./entry";
+import approved from "./assets/check-mark.png";
 
 
 function InitMapRoute() {
@@ -46,7 +47,7 @@ function MapRoute(initSuggestions) {
         map,
         position: origin,
         title: "Home",
-        content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+        content: new PinElement({ glyph: glyphImg, scale: 1.7}).element
     });
     home.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
@@ -214,7 +215,7 @@ function MapRoute(initSuggestions) {
             position: result[1],
             title: result[2],
 
-            content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+            content: new PinElement({ glyph: glyphImg, scale: 2.1}).element
 
         });
 
@@ -344,7 +345,7 @@ function UpdateMapRoute(storesSelected, postalCode) {
       map,
       position: origin,
       title: "Home",
-      content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+      content: new PinElement({ glyph: glyphImg, scale: 1.7}).element
   });
     home.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
@@ -516,7 +517,7 @@ function UpdateMapRoute(storesSelected, postalCode) {
             position: result[1],
             title: result[2],
 
-            content: new PinElement({ glyph: glyphImg, scale: 1.5}).element
+            content: new PinElement({ glyph: glyphImg, scale: 2.1}).element
 
         });
 
@@ -851,11 +852,13 @@ function Ingredients({
           Next
           </button>
       </div>
-      <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
-        <div className="flex flex-col gap-8 justify-center h-[20rem]">
-          <h1 id="header" className="bg-whitesmoke text-7xl text-raisin-black font-bold text-center font-sans mt-14">
+      <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6 mt-14">
+        <div className="flex flex-col gap-8 justify-center h-[20rem] ">
+          <div className="bg-whitesmoke rounded-lg">
+          <h1 id="header" className=" text-7xl text-raisin-black font-bold text-center font-sans">
             Grocery Run
           </h1>
+          </div>
           <p className="text-center text-2xl">
             Start by adding the ingredients you want to buy
           </p>
@@ -1265,6 +1268,7 @@ export function GetYourStuff({ setScreenId }) {
         }}
       >
       <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white">
+        <h1 className="text-4xl font-bold">Complete Your Payment</h1>
         <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Email
           <input type="email" name="email" className="border rounded-lg p-2 ml-2" />
@@ -1357,6 +1361,7 @@ export function GetYourStuff({ setScreenId }) {
       {paybiltData !== null &&
         (approved ? (
           <>
+            {alert("Payment Complete!")}
             <h2 className="text-2xl font-bold">
               Payment complete! Thanks for shopping.
             </h2>
