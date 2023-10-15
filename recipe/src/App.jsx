@@ -808,22 +808,27 @@ function Ingredients({
       </div>
       <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
         <div className="flex flex-col gap-8 justify-center h-[20rem]">
-          <h1 id="header" className="text-7xl text-raisin-black font-bold text-center font-sans">
+          <h1 id="header" className="bg-whitesmoke text-7xl text-raisin-black font-bold text-center font-sans mt-14">
             Grocery Run
           </h1>
-          <p className="text-center">
+          <p className="text-center text-2xl">
             Start by adding the ingredients you want to buy
           </p>
           <div className="flex justify-center items-center">
             <div className=" font-custom block w-fit p-6 bg-whitesmoke rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 justify-center items-center hover:animate-bounce">
-              <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
+              <h1 className="text-3xl font-bold text-jungle-green">Here{"'"}s how it works:</h1>
               <ol className="list-decimal list-inside">
-                <li>You enter the recipe that you want</li>
-                <li>
-                  We find the best deals from local stores to fulfill your
-                  recipe
+                <li>You enter your grocery list</li>
+                <li className="my-2">
+                  We find the best deals from local stores and give you travel paths, the projected time you'll spend shopping, and the cost.
                 </li>
-                <li>You save time and money for that next meal!</li>
+                <li className="my-2">
+                  If you don't want to drive, checkout with Paybilt Instant Interact E-transfer.
+                </li>
+                <li className="my-2">
+                  As a bonus, find recipes you can make with your ingredients.
+                </li >
+                <li className="my-2">You save time and money for that next meal!</li>
               </ol>
             </div>
           </div>
@@ -959,7 +964,7 @@ function Another({
     //call filter endpoint whenever StoresSelected changes
   }
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(0)}
@@ -1036,11 +1041,11 @@ function Another({
 
 export function SuggestRecipes({ setScreenId, recipe }) {
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(1)}
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white"
         >
           Back
         </button>
@@ -1052,7 +1057,7 @@ export function SuggestRecipes({ setScreenId, recipe }) {
         </button> */}
       </div>
       <div className="space-y-8 flex-grow">
-        <h1 className="text-4xl font-bold">What are you cooking?</h1>
+        <h1 className="text-4xl font-bold">Need help with meal prep?</h1>
         <h2 className="text-xl">Here&apos;s a recipe suggestion:</h2>
         <p className="whitespace-pre-line">
           {recipe.length !== 0 ? recipe : "Loading a recipe..."}
@@ -1067,11 +1072,11 @@ export function GetYourStuff({ setScreenId }) {
   const [paybiltData, setPaybiltData] = useState(null);
   const [approved, setApproved] = useState(false);
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(1)}
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white"
         >
           Back
         </button>
@@ -1120,92 +1125,95 @@ export function GetYourStuff({ setScreenId }) {
           }, 5000);
         }}
       >
-        <label>
+      <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white">
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Email
-          <input type="email" name="email" className="border" />
+          <input type="email" name="email" className="border rounded-lg p-2 ml-2" />
         </label>
 
-        <label>
+       <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="phone">
           Phone{" "}
           <input
             type="phone"
             name="phone"
             defaultValue="0000000000"
-            className="border p-2 rounded"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="first name">
           First Name{" "}
           <input
             type="text"
             name="first_name"
             defaultValue="King"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Last Name
           <input
             type="text"
             name="last_name"
             defaultValue="Warrior"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Address
           <input
             type="text"
             name="address"
             defaultValue="200 University Ave W"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           City
           <input
             type="text"
             name="city"
             defaultValue="Waterloo"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Province (State)
           <input
             type="text"
             name="state"
             defaultValue="Ontario"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Country{" "}
           <select name="country" className="border">
             <option defaultValue="CA">Canada</option>
           </select>
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Postal Code (Zip Code){" "}
           <input
             type="text"
             name="zip_code"
             defaultValue="N2L 3G1"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
         <button
           type="submit"
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="relative group bg-hover-dgreen rounded-full py-2 px-4 text-white overflow-hidden"
         >
-          Pay with Paybilt
+          <div class="absolute inset-0 w-0 bg-cambridge-blue transition-all duration-[250ms] ease-out group-hover:w-full"></div>
+          <span class="relative text-white group-hover:text-black">Pay with Paybilt</span>
         </button>
+        </div>
       </form>
       {paybiltData !== null &&
         (approved ? (
