@@ -264,30 +264,31 @@ function StoreSuggestions({ selectedStores }) {
     "Remove FreshCo from your run for $3.54 more to save 15 minutes on your run",
     "Add FoodBasics to your run to save $15.20 for 10 minutes on your run",
     "Don't eat to save 100% of the costs on this run",
-    "Fourth suggestion here",
-    "Fifth suggestion here",
-    "Eat 50% to to save 50% of the costs on this run",
-    "Eat 50% to to save 50% of the costs on this run",
-    "Eat 50% to to save 50% of the costs on this run",
-    "Eat 50% to to save 50% of the costs on this run",
-    "Eat 50% to to save 50% of the costs on this run",
     "Eat 50% to to save 50% of the costs on this run",
   ];
 
   return (
+    <div>
+    <h2 className="text-2xl font-bold">Store Suggestions:</h2>
     <div
       className={`suggestions ${
-        selectedStores.length > 0 ? "block" : "hidden " + "overflow-x-scroll"
+        selectedStores.length > 0 ? "block" : "hidden "
       }`}
+      style={{
+      overflowX: "scroll",
+      overflowY: "hidden", // Hide vertical overflow
+      width: "100%",
+      maxHeight: "200px", // Set a fixed height as an example
+      }} 
     >
-      <h2 className="text-2xl font-bold">Store Suggestions:</h2>
-      <div className="flex space-x-2">
+      <div className="flex space-x-2 overflow-y-hidden overflow-x-scroll w-screen h-auto">
         {suggestions.map((suggestion, index) => (
-          <div className="bg-yellow-100 w-3/5 h-3/5 p-2" key={index}>
-            {suggestion}
+          <div className="bg-yellow-100 p-2 rounded-lg" key={index} style={{height:"5vw",width:"100vw"}}>
+            <p>{suggestion}</p>
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }
@@ -458,23 +459,23 @@ function Ingredients({
       <div className="flex justify-end">
         <button
           onClick={firstPageNext}
-          className="bg-cambridge-blue rounded-full py-2 px-4 text-white font-bold text-raisin-black"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold text-raisin-black font-fake-receipt"
         >
           Next
         </button>
       </div>
       <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
         <div className="flex flex-col gap-8 justify-center h-[20rem]">
-          <h1 className="text-4xl text-raisin-black font-bold text-center font-sans">
+          <h1 id="header" className="text-7xl text-raisin-black font-bold text-center font-sans">
             Grocery Run
           </h1>
           <p className="text-center">
             Start by adding the ingredients you want to buy
           </p>
           <div className="flex justify-center items-center">
-            <div className="block max-w-md p-6 bg-coral-pink rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 justify-center items-center hover:animate-bounce">
+            <div className=" font-custom block w-fit p-6 bg-whitesmoke rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 justify-center items-center hover:animate-bounce">
               <h1 className="text-3xl font-bold">Here{"'"}s how it works:</h1>
-              <ol className="list-decimal list-outside">
+              <ol className="list-decimal list-inside">
                 <li>You enter the recipe that you want</li>
                 <li>
                   We find the best deals from local stores to fulfill your
@@ -610,7 +611,7 @@ function Another({
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(0)}
-          className="bg-cambridge-blue rounded-full py-2 px-4 text-white font-bold"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold"
         >
           Back
         </button>
@@ -622,7 +623,7 @@ function Another({
         </button>
         <button
           onClick={() => setScreenId(3)}
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white font-bold"
         >
           I&apos;ll get it myself
         </button>
@@ -666,7 +667,7 @@ function Another({
             <StoreSuggestions selectedStores={storesSelected} />
             <InitMapRoute />
             <div>
-              <div id="resultsList">
+              <div className="grid grid-cols-3" id="resultsList">
                 {currentList.map((result, id) => {
                   return <SearchResultItem item={result} key={id} />;
                 })}
@@ -684,7 +685,7 @@ export function SuggestRecipes({ setScreenId, recipe }) {
     <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-between">
         <button
-          onClick={() => setScreenId(2)}
+          onClick={() => setScreenId(1)}
           className="bg-blue-500 rounded-full py-2 px-4 text-white"
         >
           Back
