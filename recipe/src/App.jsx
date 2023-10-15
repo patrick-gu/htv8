@@ -752,7 +752,7 @@ function App() {
           currentCost={currentCost}
           setCurrentCost={setCurrentCost}
         />
-        <GetYourStuff setScreenId={setScreenId} />
+        <GetYourStuff setScreenId={setScreenId} currentCost={currentCost}/>
         <SuggestRecipes setScreenId={setScreenId} recipe={recipe} />
         
       </main>
@@ -1257,7 +1257,7 @@ export function SuggestRecipes({ setScreenId, recipe }) {
   );
 }
 
-export function GetYourStuff({ setScreenId }) {
+export function GetYourStuff({ setScreenId, currentCost }) {
   const [nonce] = useState(() => Math.random().toString());
   const [paybiltData, setPaybiltData] = useState(null);
   const [approved, setApproved] = useState(false);
@@ -1282,10 +1282,10 @@ export function GetYourStuff({ setScreenId }) {
           }
           dict.items = [
             {
-              name: "tomato",
+              name: "Grocery delivery",
               quantity: 1,
-              description: "just a tomato",
-              unit_price: 2,
+              description: "Itemized version to come!",
+              unit_price: parseFloat(currentCost),
             },
           ];
           dict.nonce = nonce;
@@ -1302,7 +1302,7 @@ export function GetYourStuff({ setScreenId }) {
           const { txid } = body;
           setPaybiltData(body.message);
           // poll for updates from Paybilt
-          const timeout = setTimeout(async () => {
+          const timeout = setInterval(async () => {
             const res = await fetch(
               `http://127.0.0.1:8080/paybilt/status/${txid}`
             );
@@ -1310,9 +1310,9 @@ export function GetYourStuff({ setScreenId }) {
             console.log(body);
             if (body.status === "approved") {
               setApproved(true);
-              clearTimeout(timeout);
+              clearInterval(timeout);
             }
-          }, 5000);
+          }, 1000);
         }}
       >
       <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white drop-shadow">

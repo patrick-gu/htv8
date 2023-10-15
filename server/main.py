@@ -338,7 +338,7 @@ async def payment_paybilt(request: Request):
         "ip_address": str(request.client),
         "ntf_url": "https://docs.paybilt.com/reference/e-transfer-payment",  # random url for now
         "udfs": [body["nonce"]],
-        "shipping_cost": 12.97,
+        "shipping_cost": 0,
         "return_url": "https://github.com/patrick-gu/htv8",  # also here
         "convenience_fee": 0
     }
