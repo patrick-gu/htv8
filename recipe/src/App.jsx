@@ -1056,8 +1056,6 @@ function Another({
   // Function to handle changes in the postal code input field
   const handlePostalCodeChange = (e) => {
     setPostalCode(e.target.value);
-    setSuggestions([]);
-    findSuggestions({ postalCode, storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s));
   };
 
   // Function to add the entered postal code to the state
@@ -1072,6 +1070,11 @@ function Another({
     // console.log(e.target.value);
   };
 
+  useEffect(() => {
+    setSuggestions([]);
+    findSuggestions({ postalCode, storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s));
+  }, [postalCode, storesSelected, ingredientsList, quantities]);
+
   const handleStoreSelect = async(store) => {
     let newStoresSelected;
     if (storesSelected.includes(store)) {
@@ -1083,8 +1086,6 @@ function Another({
       newStoresSelected = [...storesSelected, store];
     }
     setStoresSelected(newStoresSelected);
-    setSuggestions([]);
-    findSuggestions({ postalCode, storesSelected, ingredientsList, quantities }).then((s) => setSuggestions(s));
     
       await axios.post('http://127.0.0.1:8080/filter', {
         storesList: newStoresSelected,
