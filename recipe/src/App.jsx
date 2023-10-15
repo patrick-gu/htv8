@@ -891,7 +891,7 @@ function Another({
     //call filter endpoint whenever StoresSelected changes
   }
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(0)}
@@ -968,11 +968,11 @@ function Another({
 
 export function SuggestRecipes({ setScreenId, recipe }) {
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(1)}
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white"
         >
           Back
         </button>
@@ -999,11 +999,11 @@ export function GetYourStuff({ setScreenId }) {
   const [paybiltData, setPaybiltData] = useState(null);
   const [approved, setApproved] = useState(false);
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(1)}
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="bg-raisin-black rounded-full py-2 px-4 text-white"
         >
           Back
         </button>
@@ -1052,92 +1052,95 @@ export function GetYourStuff({ setScreenId }) {
           }, 5000);
         }}
       >
-        <label>
+      <div className="flex flex-col space-y-4 justify-center items-start">
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Email
-          <input type="email" name="email" className="border" />
+          <input type="email" name="email" className="border rounded-lg p-2 ml-2" />
         </label>
 
-        <label>
+       <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="phone">
           Phone{" "}
           <input
             type="phone"
             name="phone"
             defaultValue="0000000000"
-            className="border p-2 rounded"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="first name">
           First Name{" "}
           <input
             type="text"
             name="first_name"
             defaultValue="King"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Last Name
           <input
             type="text"
             name="last_name"
             defaultValue="Warrior"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Address
           <input
             type="text"
             name="address"
             defaultValue="200 University Ave W"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           City
           <input
             type="text"
             name="city"
             defaultValue="Waterloo"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Province (State)
           <input
             type="text"
             name="state"
             defaultValue="Ontario"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Country{" "}
           <select name="country" className="border">
             <option defaultValue="CA">Canada</option>
           </select>
         </label>
 
-        <label>
+        <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
           Postal Code (Zip Code){" "}
           <input
             type="text"
             name="zip_code"
             defaultValue="N2L 3G1"
-            className="border"
+            className="border rounded-lg p-2 ml-2"
           />
         </label>
 
         <button
           type="submit"
-          className="bg-blue-500 rounded-full py-2 px-4 text-white"
+          className="relative group bg-hover-dgreen rounded-full py-2 px-4 text-white overflow-hidden"
         >
-          Pay with Paybilt
+          <div class="absolute inset-0 w-0 bg-cambridge-blue transition-all duration-[250ms] ease-out group-hover:w-full"></div>
+          <span class="relative text-white group-hover:text-black">Pay with Paybilt</span>
         </button>
+        </div>
       </form>
       {paybiltData !== null &&
         (approved ? (
