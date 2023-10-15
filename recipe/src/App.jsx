@@ -1282,8 +1282,8 @@ export function GetYourStuff({ setScreenId }) {
           }, 5000);
         }}
       >
-      <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start bg-white drop-shadow">
-        <h1 className="text-4xl font-bold">Complete Your Payment 💵</h1>
+      <div className="relative w-1/2 max-h-screen flex flex-col space-y-4 p-4 left-1/4 rounded-lg items-start drop-shadow text-center ">
+        {/* <h1 className="text-4xl font-bold ml-14">Complete Your Payment 💵</h1> */}
         {approved ?(<img src={checkMark} />):(
         <div>  
         <label class="block text-raisin-black font-bold md:text-right mb-1 md:mb-0 pr-4" for="email">
@@ -1380,7 +1380,7 @@ export function GetYourStuff({ setScreenId }) {
       {paybiltData !== null &&
         (approved ? (
           <>
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-2xl font-bold text-center">
               Payment complete! Thanks for shopping.
             </h2>
           </>
