@@ -1,63 +1,64 @@
 import { useState } from "react";
-import axios from "axios";
+import axios from 'axios';
 import chevronDown from "./assets/chevron-down.png";
 import chevronUp from "./assets/chevron-up.png";
 import SearchResultItem from "./entry";
 
+
 function InitMapRoute() {
-  return <div style={{ height: 600 + "px" }} id="map"></div>;
+  return( <div style={ {height: 600 + "px"}} id="map"></div> )
 }
 
-function MapRoute() {
-  let map;
 
+
+
+function MapRoute() {
   async function initMap() {
     let origin = { lat: 43.7867303, lng: -79.1920265 };
+   
 
     // Initializing the map
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement, PinElement } =
-      await google.maps.importLibrary("marker");
+    const { AdvancedMarkerElement, PinElement} = await google.maps.importLibrary("marker")
 
-    map = new Map(document.getElementById("map"), {
-      center: origin,
-      zoom: 15,
-      mapId: "d5dc8cb3b04938bd",
+    const map = new Map(document.getElementById("map"), {
+    center: origin,
+    zoom: 12,
+    mapId: 'd5dc8cb3b04938bd',
     });
 
-    const infoWindow = new InfoWindow();
 
-    const home = new AdvancedMarkerElement({
-      map,
-      position: origin,
-      title: "home",
-      content: new PinElement({ glyph: String(0) }).element,
+
+
+      const infoWindow = new InfoWindow();
+      
+
+
+      const home = new AdvancedMarkerElement({
+        map,
+        position: origin,
+        title: "Home",
+        content: new PinElement({ glyph: String(0) }).element
     });
     home.addListener("click", ({ domEvent, latLng }) => {
-      const { target } = domEvent;
+        const { target } = domEvent;
 
-      infoWindow.close();
-      infoWindow.setContent(home.title);
-      infoWindow.open(home.map, home);
-    });
+        infoWindow.close();
+        infoWindow.setContent(home.title);
+        infoWindow.open(home.map, home);
+      });
+
 
     const placesService = new google.maps.places.PlacesService(map);
 
-    let input = [
-      "Walmart Supercentre",
-      "Metro",
-      "Food Basics",
-      "NoFrills",
-      "Costco",
-      "FreshCo",
-      "Superstore",
-    ];
 
+    let input = ["Walmart Supercentre", "Metro", "Food Basics", "NoFrills", "Costco", "FreshCo", "Superstore"];
+
+    
     async function getLocations(stores) {
         
         let storetype;
         function addPlaces(results, store) {
-
             // for (const location of results) {
             //     const marker = new AdvancedMarkerElement({
             //         map,
@@ -75,12 +76,8 @@ function MapRoute() {
             //         infoWindow.open(marker.map, marker);
             //       });    
             // }
-
         }
 
-
-
-        // T&T, Sobeys, Superstore, loblaws has 2
 
         for (let store of stores) {
             console.log(store);
@@ -117,6 +114,8 @@ function MapRoute() {
         getMinDist(origin, locations, [], 0)
     }
 
+
+    
     let locations = [];
 
     const directionsService = new google.maps.DirectionsService();
@@ -141,31 +140,35 @@ function MapRoute() {
         let request;
         let result;
 
-      for (let i = 0; i < places.length; i++) {
-        for (const store of places[i]) {
-          request = {
-            origins: [start],
-            destinations: [store.geometry.location],
-            travelMode: google.maps.TravelMode.DRIVING,
-            unitSystem: google.maps.UnitSystem.METRIC,
-            avoidHighways: false,
-            avoidTolls: false,
-          };
 
-          result = await new Promise((res, rej) => {
-            distanceService.getDistanceMatrix(request).then((response) => {
-              let data = response.rows[0].elements[0];
-              let time = Number(data.duration.text.split(" ")[0]);
+        for (let i = 0; i < places.length; i++) {
+            
+            for (const store of places[i]) {
 
-              if (time < minRoute[0]) {
-                minRoute = [time, store.geometry.location, store.name, i];
-              }
-              res(minRoute);
-            });
-          });
+                request = {
+                    origins: [start],
+                    destinations: [store.geometry.location],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC,
+                    avoidHighways: false,
+                    avoidTolls: false,
+                };
+                
+                result = await new Promise((res,rej) => {
+                    distanceService.getDistanceMatrix(request).then((response) => {
+                        
+                        let data = response.rows[0].elements[0];
+                        let time = Number(data.duration.text.split(" ")[0])
+
+                        if (time < minRoute[0]) {
+                            minRoute = [time, store.geometry.location, store.name, i];
+                        }
+                        res(minRoute);
+                    });
+                })
+            }
         }
-      }
-      console.log(result[3], places, places[result[3]]);
+        console.log(result[3], places, places[result[3]])
 
 
 
@@ -201,27 +204,8 @@ function MapRoute() {
             getMinDist(result[1], places, waypoints, time);
         }
 
-      if (places.length === 0) {
-        calculateAndDisplayRoute(
-          directionsService,
-          directionsRenderer,
-          waypoints
-        );
-      } else {
-        // console.log(places)
-        getMinDist(result[1], places, waypoints);
-      }
     }
 
-    function calculateAndDisplayRoute(
-      directionsService,
-      directionsRenderer,
-      pts
-    ) {
-      const waypts = [];
-      for (const pt of pts) {
-        waypts.push({ location: pt, stopover: true });
-      }
 
 
 
@@ -240,23 +224,307 @@ function MapRoute() {
 
         directionsService
         .route({
-          origin: new google.maps.LatLng(origin.lat, origin.lng),
+            origin: new google.maps.LatLng(origin.lat, origin.lng) ,
+            destination: new google.maps.LatLng(origin.lat, origin.lng),
+            waypoints: waypts,
+            optimizeWaypoints: true,
+            travelMode: google.maps.TravelMode.DRIVING,
+        })
+        .then((response) => {
+            directionsRenderer.setDirections(response);
+            console.log(time);
+            // time = total trip time
+        })
+
+    }
+
+    
+    getLocations(input);
+
+    
+      
+}
+  initMap();  
+}
+
+
+function UpdateMapRoute(storesSelected, postalCode) {
+  async function updateMap() {
+    var origin = { lat: 43.7867303, lng: -79.1920265 };
+
+    // Initializing the map
+    const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement, PinElement} = await google.maps.importLibrary("marker")
+
+
+    const map = new Map(document.getElementById("map"), {
+    center: origin,
+    zoom: 12,
+    mapId: 'd5dc8cb3b04938bd',
+    });
+
+    const infoWindow = new InfoWindow();
+    
+
+
+    const geocoder = new google.maps.Geocoder();
+    console.log("jllkjlk", postalCode);
+
+    if (postalCode != "") {
+      origin = await new Promise((res, rej) => {
+            geocoder.geocode({ 'address': 'zipcode ' + postalCode }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                var latitude = results[0].geometry.location.lat();
+                var longitude = results[0].geometry.location.lng();
+                res({lat: latitude, lng: longitude})
+
+            } else {
+                alert("Request failed.")
+            }
+          }); 
+        });
+      }
+
+    console.log(origin);
+
+    
+
+    const home = new AdvancedMarkerElement({
+        map,
+        position: origin,
+        title: "Home",
+        content: new PinElement({ glyph: String(0) }).element
+    });
+    home.addListener("click", ({ domEvent, latLng }) => {
+        const { target } = domEvent;
+  
+        infoWindow.close();
+        infoWindow.setContent(home.title);
+        infoWindow.open(home.map, home);
+      });
+
+
+    
+
+    const placesService = new google.maps.places.PlacesService(map);
+
+
+    
+
+    const convertedStoresSelected = [];
+
+    for (let store of storesSelected) {
+      
+      if (store === "No Frills") {
+        convertedStoresSelected.push("NoFrills");
+      }
+      else if (store === "Walmart") {
+        convertedStoresSelected.push("Walmart Supercentre");
+      }
+      else if (store === "Real Canadian Superstore") {
+        convertedStoresSelected.push("Superstore");
+      }
+      else {
+        convertedStoresSelected.push(store);
+      }
+
+    }
+
+
+    let input = convertedStoresSelected;
+
+    async function getLocations(stores) {
+        
+        let storetype;
+        function addPlaces(results, store) {
+            // for (const location of results) {
+            //     const marker = new AdvancedMarkerElement({
+            //         map,
+            //         position: location.geometry.location,
+            //         title: location.name,
+            //         content: new PinElement({ glyph: String(store[0]) }).element
+
+            //     });
+
+            //     marker.addListener("click", ({ domEvent, latLng }) => {
+            //         const { target } = domEvent;
+              
+            //         infoWindow.close();
+            //         infoWindow.setContent(marker.title);
+            //         infoWindow.open(marker.map, marker);
+            //       });    
+            // }
+        }
+
+
+        for (let store of stores) {
+            storetype = "supermarket"
+            if (store === "NoFrills" || store === "FreshCo" || store === "Superstore") storetype = "grocery_or_supermarket";
+            if (store === "Costco") storetype = "department_store";
+
+            const {results, status } = await new Promise((res, rej) => {
+                placesService.nearbySearch(
+                    { location: origin, radius: 10000, name: store, type: storetype},
+                    (results, status) => {
+
+                        if (store === "Costco") {
+                            results = results.filter((v) => (v.name !== "Costco Business Centre"))
+                        }
+
+                        if (store === "Superstore") {
+                            results = results.filter((v) => (v.name.includes("Real Canadian")))
+                        }
+
+
+
+                        
+                        res({ results, status});
+                    })
+            })
+            if (status !== "OK" || !results) return;
+            addPlaces(results, store);
+            locations.push(results);
+
+            
+        }
+        
+        getMinDist(origin, locations, [], 0)
+    }
+
+
+    
+    let locations = [];
+
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer({
+      suppressInfoWindows: true,
+      suppressMarkers: true,
+      map: map
+    });
+    directionsRenderer.setMap(map);
+
+
+
+
+
+    // Distance Function
+    const distanceService = new google.maps.DistanceMatrixService();
+
+
+
+    async function getMinDist(start, places, waypoints, time) {
+        let minRoute = [9999999999999999999, ""];
+        let request;
+        let result;
+
+
+        for (let i = 0; i < places.length; i++) {
+            
+            for (const store of places[i]) {
+
+                request = {
+                    origins: [start],
+                    destinations: [store.geometry.location],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC,
+                    avoidHighways: false,
+                    avoidTolls: false,
+                };
+                
+                result = await new Promise((res,rej) => {
+                    distanceService.getDistanceMatrix(request).then((response) => {
+                        
+                        let data = response.rows[0].elements[0];
+                        let time = Number(data.duration.text.split(" ")[0])
+
+                        if (time < minRoute[0]) {
+                            minRoute = [time, store.geometry.location, store.name, i];
+                        }
+                        res(minRoute);
+                    });
+                })
+            }
+        }
+
+
+
+        waypoints.push(result[1]);
+        places.splice(result[3], 1);
+
+        time = time += result[0];
+
+
+        const marker = new AdvancedMarkerElement({
+            map,
+            position: result[1],
+            title: result[2],
+            content: new PinElement({ glyph: String(result[2])[0] }).element
+
+        });
+
+        marker.addListener("click", ({ domEvent, latLng }) => {
+            const { target } = domEvent;
+      
+            infoWindow.close();
+            infoWindow.setContent(marker.title);
+            infoWindow.open(marker.map, marker);
+          });    
+
+
+
+        if (places.length === 0) {
+            calculateAndDisplayRoute(directionsService, directionsRenderer, waypoints, time);
+        } 
+        else {
+            // console.log(places)
+            getMinDist(result[1], places, waypoints, time);
+        }
+
+    }
+
+
+
+
+    function calculateAndDisplayRoute(directionsService, directionsRenderer, pts, time) {
+
+      let waypts = [];
+      for (const pt of pts) {
+        waypts.push({location: pt, stopover: true})
+      }
+        
+      console.log(origin, origin.lat, origin.lng);
+
+      directionsService
+      .route({
+          origin: new google.maps.LatLng(origin.lat, origin.lng) ,
           destination: new google.maps.LatLng(origin.lat, origin.lng),
           waypoints: waypts,
           optimizeWaypoints: true,
           travelMode: google.maps.TravelMode.DRIVING,
-        })
-        .then((response) => {
+      })
+      .then((response) => {
           directionsRenderer.setDirections(response);
           console.log(response);
-        });
+          console.log(time);
+          // time = total trip time
+      })
+
     }
 
-  }
+    
     getLocations(input);
+
+      
+        
+  }
+  console.log(storesSelected)
+  updateMap();
 }
-  initMap();
-}
+
+
+
+
+
 
 function StoreSuggestions({ selectedStores }) {
   // For now, let's assume it's a simple array of suggestions
@@ -277,7 +545,7 @@ function StoreSuggestions({ selectedStores }) {
   return (
     <div
       className={`suggestions ${
-        selectedStores.length > 0 ? "block" : "hidden " + "overflow-x-scroll"
+        selectedStores.length > 0 ? "block" : "hidden " +"overflow-x-scroll" 
       }`}
     >
       <h2 className="text-2xl font-bold">Store Suggestions:</h2>
@@ -358,6 +626,7 @@ function App() {
         />
         <GetYourStuff setScreenId={setScreenId} />
         <SuggestRecipes setScreenId={setScreenId} recipe={recipe} />
+        
       </main>
     </div>
   );
@@ -374,15 +643,15 @@ function Ingredients({
   setQuantity,
   setRecipe,
   currentList,
-  setCurrentList,
+  setCurrentList
 }) {
   //change of state when user types into the ingredients bar
   const handleIngredientChange = (e) => {
     setIngredient(e.target.value); // Update the ingredient state when the input changes
-  };
+  };  
 
   const firstPageNext = async () => {
-    console.log("fetching...")
+    // console.log("fetching...")
     axios
       .post("http://127.0.0.1:8080/filter", {
         storesList: storesSelected,
@@ -399,17 +668,17 @@ function Ingredients({
       });
     // console.log("bump screen")
     setScreenId(1);
-    fetch("http://127.0.0.1:8080/recipe/suggest", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ingredients: ingredientsList }),
-    }).then(async (response) => {
-      const { content } = await response.json();
-      console.log(content);
-      setRecipe(content);
-    });
+    // fetch("http://127.0.0.1:8080/recipe/suggest", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ ingredients: ingredientsList }),
+    // }).then(async (response) => {
+    //   const { content } = await response.json();
+    //   console.log(content);
+    //   setRecipe(content);
+    // });
   };
 
   //append ingredient to list
@@ -417,7 +686,7 @@ function Ingredients({
     const defaultQuantity = 1; //add 1 of each quantity by default
     if (ingredient.trim() !== "") {
       setIngredientsList([...ingredientsList, ingredient]); // Append the ingredient to the list
-      setQuantity([...quantities, defaultQuantity]); //add the quantity
+      setQuantity([...quantities, defaultQuantity]); //add the quantity 
       setIngredient(""); // Clear the input field
     }
   };
@@ -425,20 +694,20 @@ function Ingredients({
   //called when user wants to increase quantity
   const handleQuantityUp = (index) => {
     const updatedList = [...quantities];
-    updatedList[index]++; // Decrease one
+    updatedList[index]++; // Decrease one 
     setQuantity(updatedList);
-  };
+  }
 
   //called when user wants to decrease quantity
   const handleQuantityDown = (index) => {
     const updatedList = [...quantities];
-    updatedList[index]--; // Decrease one
-    if (updatedList[index] == 0) {
-      handleRemoveIngredient(index);
-      updatedList.splice(index, 1); //have to remove the quantity from the parallel array too
+    updatedList[index]--; // Decrease one 
+    if(updatedList[index] == 0){
+      handleRemoveIngredient(index); 
+      updatedList.splice(index, 1); //have to remove the quantity from the parallel array too 
     }
     setQuantity(updatedList);
-  };
+  }
   //called when user wants to remove ingredients
   const handleRemoveIngredient = (index) => {
     const updatedList = [...ingredientsList];
@@ -461,7 +730,7 @@ function Ingredients({
           className="bg-cambridge-blue rounded-full py-2 px-4 text-white font-bold text-raisin-black"
         >
           Next
-        </button>
+          </button>
       </div>
       <div className="grid grid-cols-2 gap-8 space-y-8 md:grid-cols-2 flex-grow h-5/6">
         <div className="flex flex-col gap-8 justify-center h-[20rem]">
@@ -493,7 +762,7 @@ function Ingredients({
                 className="shadow appearance-none border rounded w-fit py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-4"
                 id="ingredient"
                 type="text"
-                placeholder="Enter your items!"
+                placeholder="Enter your ingredient!"
                 value={ingredient}
                 onChange={handleIngredientChange}
                 onKeyUp={handleEnter}
@@ -541,16 +810,17 @@ function Ingredients({
   );
 }
 
-function Another({
-  stores,
-  storesSelected,
-  setStoresSelected,
-  setScreenId,
-  ingredientsList,
-  quantities,
-  currentList,
-  setCurrentList,
+function Another({ 
+  stores, 
+  storesSelected, 
+  setStoresSelected, 
+  setScreenId, 
+  ingredientsList, 
+  quantities, 
+  currentList, 
+  setCurrentList
 }) {
+
   const [postalCode, setPostalCode] = useState(""); // State to store the postal code
 
   // Function to handle changes in the postal code input field
@@ -563,54 +833,63 @@ function Another({
     if (postalCode.trim() !== "") {
       setPostalCode(""); // Clear the input field after use
     }
+    
+    setPostalCode(postalCode);
+
+    UpdateMapRoute(storesSelected, postalCode);
+    // console.log(e.target.value);
   };
 
-  const handleStoreSelect = async (store) => {
+  const handleStoreSelect = async(store) => {
     if (storesSelected.includes(store)) {
       // Store is already selected, remove it and change the background to white
-      const newStoresSelected = storesSelected.filter(
-        (selectedStore) => selectedStore !== store
+      const newStoresSelected=storesSelected.filter((selectedStore) => selectedStore !== store);
+      setStoresSelected(
+        newStoresSelected
       );
-      setStoresSelected(newStoresSelected);
 
-      await axios
-        .post("http://127.0.0.1:8080/filter", {
-          storesList: newStoresSelected,
-          shoppingList: ingredientsList,
-          quantities: quantities,
+      await axios.post('http://127.0.0.1:8080/filter', {
+        storesList: newStoresSelected,
+        shoppingList: ingredientsList,
+        quantities: quantities,
         })
         .then(function (response) {
           setCurrentList(response.data[0]);
-          console.log(response.data[0]);
+          console.log(response.data[0])
+          UpdateMapRoute(newStoresSelected, postalCode);
         })
         .catch(function (error) {
           console.log(error);
         });
-    } else {
+    }
+    else {
       // Store is not selected, add it and change the background to green
+      
       setStoresSelected([...storesSelected, store]);
-      await axios
-        .post("http://127.0.0.1:8080/filter", {
-          storesList: [...storesSelected, store],
-          shoppingList: ingredientsList,
-          quantities: quantities,
+      const newStoresSelected = [...storesSelected, store];
+
+      await axios.post('http://127.0.0.1:8080/filter', {
+        storesList: [...storesSelected, store],
+        shoppingList: ingredientsList,
+        quantities: quantities
         })
         .then(function (response) {
           setCurrentList(response.data[0]);
-          console.log(response.data[0]);
+          console.log(response.data[0])
+          UpdateMapRoute(newStoresSelected, postalCode);
         })
         .catch(function (error) {
           console.log(error);
         });
     }
     //call filter endpoint whenever StoresSelected changes
-  };
+  }
   return (
-    <section className="w-screen min-h-screen p-8 flex flex-col gap-8 bg-khaki">
+    <section className="w-screen min-h-screen p-8 flex flex-col gap-8">
       <div className="flex justify-between">
         <button
           onClick={() => setScreenId(0)}
-          className="bg-cambridge-blue rounded-full py-2 px-4 text-white font-bold"
+          className="bg-blue-500 rounded-full py-2 px-4 text-white"
         >
           Back
         </button>
@@ -624,7 +903,7 @@ function Another({
           onClick={() => setScreenId(3)}
           className="bg-blue-500 rounded-full py-2 px-4 text-white"
         >
-          I&apos;ll get it myself
+          Get recipes
         </button>
       </div>
       <div className="space-y-8 flex-grow">
@@ -639,7 +918,7 @@ function Another({
             type="text"
             placeholder="Enter postal code"
             value={postalCode}
-            onChange={handlePostalCodeChange}
+            onChange= {(e)=>setPostalCode(e.target.value)}
           ></input>
           <button
             className="bg-jungle-green text-white font-bold py-2 px-4 rounded-full hover:bg-dgreen"
@@ -667,10 +946,12 @@ function Another({
             <InitMapRoute />
             <div>
               <div id="resultsList">
-                {currentList.map((result, id) => {
-                  return <SearchResultItem item={result} key={id} />;
-                })}
-              </div>
+              {
+                  currentList.map((result, id)=>{
+                      return <SearchResultItem item={result} key={id}/>
+                  })
+              }
+              </div> 
             </div>
           </div>
         </div>
@@ -752,7 +1033,7 @@ export function GetYourStuff({ setScreenId }) {
           const { txid } = body;
           setPaybiltData(body.message);
           // poll for updates from Paybilt
-          const interval = setInterval(async () => {
+          const timeout = setTimeout(async () => {
             const res = await fetch(
               `http://127.0.0.1:8080/paybilt/status/${txid}`
             );
@@ -760,9 +1041,9 @@ export function GetYourStuff({ setScreenId }) {
             console.log(body);
             if (body.status === "approved") {
               setApproved(true);
-              clearInterval(interval);
+              clearTimeout(timeout);
             }
-          }, 1000);
+          }, 5000);
         }}
       >
         <label>
